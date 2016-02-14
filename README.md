@@ -1,5 +1,6 @@
 # Flytster API Documentation
 
+
 ## Flytster
 
 Flytster is a web application where users purchase flights for the cheapest price. So how does Flyster work? First one finds and purchases a flight with a departure date less than 6 months away. Then if the price of the flight decreases before one's departure, the purchaser receives credit equal to the difference. The user can then apply that credit to their next flight purchase through Flytster.   
@@ -23,13 +24,12 @@ There are a few configurations managed as environment variables. In the developm
 - [Register a new user](#register-a-new-user)
 - [Login a user](#login-a-user)
 - [Logout a user](#logout-a-user)
-- [Get the user's profile](#get-the-user's-profile)
-- [Update the user's profile](#get-the-user's-profile)
+- [Get the users profile](#get-the-users-profile)
+- [Update the users profile](#get-the-users-profile)
 
 
 ## API Routes
 
-### Users & profiles
 
 ### Register a new user
 
@@ -114,7 +114,7 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `204` if successful
 
 
-### Get the user's profile
+### Get the users profile
 
 **GET:** `/api/v1/user/`
 
@@ -135,7 +135,7 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `403` if no/incorrect token
 
 
-### Update the user's profile
+### Update the users profile
 
 **PATCH:** `/api/v1/user`
 
