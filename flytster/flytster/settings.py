@@ -27,8 +27,7 @@ if DEBUG:
 else:
     PRODUCTION = True if os.getenv('PRODUCTION').lower() == 'true' else False
 
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -43,15 +42,20 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'authentication',
+    'trips',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'authentication.auth.TokenAuthentication',
+        'authentication.models.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'NON_FIELD_ERRORS_KEY': 'detail',
+    'DATETIME_FORMAT': '%Y-%m-%dT%H:%M:%S.%fZ',
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
@@ -135,3 +139,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 TOKEN_EXP_IN_DAYS = 7
+
+# Google API
+SERVER_KEY = os.getenv('SERVER_KEY', None)
+GOOGLE_TRIP_SEARCH_URL = 'https://www.googleapis.com/qpxExpress/v1/trips/search'

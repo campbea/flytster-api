@@ -167,252 +167,449 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `400` if incorrect data is provided
 
 
-### Search for a trip
+### Verify a user's email address (not started yet)
 
-**POST:** `/api/v1/trip/search`
+**POST:** `/v1/user/verify_email/`
 
 **Body:**
 ```json
 {
-    "passengers": {
-        "adultCount": 1,
-        "childCount": 1,
-        "infantInLapCount": 1,
-        "infantInSeatCount": 1,
-        "seniorCount": 1
-
-    },
-    "flights": [
-        {   
-            "origin": "ORD",
-            "destination": "DEN",
-            "date": "2016-09-19",
-            "maxStops": 2,
-            "maxConnectionDuration": 60,
-            "preferredCabin": "COACH",
-            "permittedDepartureTime": {
-                "earliestTime": "22:00",
-                "latestTime": "23:00"
-            },
-            "permittedCarrier": ["AA", "UA"],
-            "prohibitedCarrier": ["XX", "YY"]
-        },
-        {
-            "origin": "DEN",
-            "destination": "ORD",
-            "date": "2016-09-28"
-        }
-    ],
-    "maxPrice": "USD400.00",
-    "saleCountry": "US",
-    "refundable": false,
-    "solutions": 2
+    "code": "12dfg2wer6a342g23456",
 }
 ```
 
-**Notes:**
-- `passengers`: A dict containing the number of passenger types.
-- `flgihts`: A list of flights that make up the itinerary of the trip. Generally, one-way trips are expressed using a list of length one, round trips of length two. An example of a length three trip would be: ORD->DEN, DEN->LAX, LAX->ORD.
-- `origin`: Airport or city IATA designator of the origin.
-- `destination`: Airport or city IATA designator of the destination.
-- `date`: Departure date in `YYYY-MM-DD` format.
-- `maxStops`: Max number of stops a traveler is willing to take.
-- `maxConnectionDuration`: The longest connection time between two flights a traveler is willing to take in minutes.
-- `preferredCabin`: Choices can be: `COACH`, `PREMIUM_COACH`, `BUSINESS` or `FIRST`.
-- `permittedDepartureTime`: Dict containing `earliestTime` and `latestTime` in `HH:MM` format.
-- `permittedCarrier` and `prohibitedCarrier` are both lists of 2-letter IATA airlines.
-- `maxPrice`: The most a traveler is willing to pay and is specified in ISO-4217 format.
-- `saleCountry`: IATA country code representing the point of sale.
-- `refundable`: Boolean regarding whether the purchase is refundable.
-- `solutions`: Integer representing the number of instances to return.
+**Response:** None
 
-REQUIRED VALUES are at least one adult or senior passenger, an origin, a destination, and a date.
+**Notes:**
+- `code`: Email verification codes are 20 character combinations of lowercase letters and digits
 
 **Response:**
 ```json
 {
- "trips": {
-  "tripOption": [
-   {
-    "kind": "qpxexpress#tripOption",
-    "saleTotal": "USD396.20",
-    "id": "IcL4NFJLo6KTg30NEU0yVR001",
-    "slice": [
-     {
-      "kind": "qpxexpress#sliceInfo",
-      "duration": 159,
-      "segment": [
-       {
-        "kind": "qpxexpress#segmentInfo",
-        "duration": 159,
-        "flight": {
-         "carrier": "NK",
-         "number": "847"
-        },
-        "id": "GtqiKLYW0KmaidxP",
-        "cabin": "COACH",
-        "bookingCode": "Y",
-        "bookingCodeCount": 4,
-        "marriedSegmentGroup": "0",
-        "leg": [
-         {
-          "kind": "qpxexpress#legInfo",
-          "id": "LEi1gZroQKwSOHQD",
-          "aircraft": "320",
-          "arrivalTime": "2016-02-15T14:04-07:00",
-          "departureTime": "2016-02-15T12:25-06:00",
-          "origin": "ORD",
-          "destination": "DEN",
-          "originTerminal": "3",
-          "duration": 159,
-          "onTimePerformance": 80,
-          "mileage": 885,
-          "secure": true
-         }
-        ]
-       }
-      ]
-     },
-     {
-      "kind": "qpxexpress#sliceInfo",
-      "duration": 151,
-      "segment": [
-       {
-        "kind": "qpxexpress#segmentInfo",
-        "duration": 151,
-        "flight": {
-         "carrier": "NK",
-         "number": "630"
-        },
-        "id": "GFw-cDHkkmrtzA57",
-        "cabin": "COACH",
-        "bookingCode": "Y",
-        "bookingCodeCount": 4,
-        "marriedSegmentGroup": "1",
-        "leg": [
-         {
-          "kind": "qpxexpress#legInfo",
-          "id": "LjKIcOK25qqq4igQ",
-          "aircraft": "320",
-          "arrivalTime": "2016-02-16T17:06-06:00",
-          "departureTime": "2016-02-16T13:35-07:00",
-          "origin": "DEN",
-          "destination": "ORD",
-          "destinationTerminal": "3",
-          "duration": 151,
-          "onTimePerformance": 70,
-          "mileage": 885,
-          "secure": true
-         }
-        ]
-       }
-      ]
-     }
-    ],
-    "pricing": [
-     {
-      "kind": "qpxexpress#pricingInfo",
-      "baseFareTotal": "USD342.32",
-      "saleFareTotal": "USD342.32",
-      "saleTaxTotal": "USD53.88",
-      "saleTotal": "USD396.20",
-     }
-    ]
-   },
-   {
-    "kind": "qpxexpress#tripOption",
-    "saleTotal": "USD772.20",
-    "id": "IcL4NFJLo6KTg30NEU0yVR002",
-    "slice": [
-     {
-      "kind": "qpxexpress#sliceInfo",
-      "duration": 164,
-      "segment": [
-       {
-        "kind": "qpxexpress#segmentInfo",
-        "duration": 164,
-        "flight": {
-         "carrier": "UA",
-         "number": "2015"
-        },
-        "id": "GLBMCb+xnbol7a6G",
-        "cabin": "COACH",
-        "bookingCode": "U",
-        "bookingCodeCount": 9,
-        "marriedSegmentGroup": "0",
-        "leg": [
-         {
-          "kind": "qpxexpress#legInfo",
-          "id": "LX86DsruW4u1YOMa",
-          "aircraft": "320",
-          "arrivalTime": "2016-02-16T00:14-07:00",
-          "departureTime": "2016-02-15T22:30-06:00",
-          "origin": "ORD",
-          "destination": "DEN",
-          "originTerminal": "1",
-          "duration": 164,
-          "onTimePerformance": 70,
-          "mileage": 885,
-          "meal": "Food and Beverages for Purchase",
-          "secure": true
-         }
-        ]
-       }
-      ]
-     },
-     {
-      "kind": "qpxexpress#sliceInfo",
-      "duration": 149,
-      "segment": [
-       {
-        "kind": "qpxexpress#segmentInfo",
-        "duration": 149,
-        "flight": {
-         "carrier": "UA",
-         "number": "830"
-        },
-        "id": "GL3yXZ8HBsMM24ea",
-        "cabin": "COACH",
-        "bookingCode": "U",
-        "bookingCodeCount": 9,
-        "marriedSegmentGroup": "1",
-        "leg": [
-         {
-          "kind": "qpxexpress#legInfo",
-          "id": "LDXizkdZLovU1L0a",
-          "aircraft": "320",
-          "arrivalTime": "2016-02-16T19:49-06:00",
-          "departureTime": "2016-02-16T16:20-07:00",
-          "origin": "DEN",
-          "destination": "ORD",
-          "destinationTerminal": "1",
-          "duration": 149,
-          "onTimePerformance": 80,
-          "mileage": 885,
-          "meal": "Food and Beverages for Purchase",
-          "secure": true
-         }
-        ]
-       }
-      ]
-     }
-    ],
-    "pricing": [
-     {
-      "kind": "qpxexpress#pricingInfo",
-      "baseFareTotal": "USD692.10",
-      "saleFareTotal": "USD692.10",
-      "saleTaxTotal": "USD80.10",
-      "saleTotal": "USD772.20",
-      "refundable": true
-     }
-    ]
-   }
-  ]
- }
+    "id": 5,
+    "first_name": "Tom",
+    "last_name": "Brady",
+    "email": "test@test.com",
+    "is_verified": true,
+    "timestamp": "2016-02-14T23:19:26.513620Z"
 }
 ```
 
 **Status Codes:**
 - `200` if successful
-- `400` if incorrect data is provided
+- `400` is bad data is sent
+- `404` if the code is invalid or expired
+- `409` if the email address is already verified by another user
+
+
+### Change the current user's password (not started)
+
+**POST:** `/v1/user/change-password/`
+
+**Body:**
+```json
+{
+    "old_password": "oldpass1",
+    "new_password": "newpass1"
+}
+```
+
+**Response:** None
+
+**Notes:**
+- `old_password`: must be at least 8 chars with at least 1 number
+- `new_password`: must be at least 8 chars with at least 1 number
+
+
+**Status Codes:**
+- `201` if successful
+- `400` if invalid data is provided, or `old_password` doesn't match
+
+
+### Request a password reset (not started)
+
+**POST:** `/v1/user/request-password/`
+
+**Body:**
+```json
+{
+    "login": "test@test.com",
+}
+```
+
+**Response:** None
+
+**Notes:**
+`login` can be any valid email address. The reset code will be emailed to the user.
+
+**Status Codes:**
+- `200` if successful
+- `400` is bad data is sent
+- `404` if the login is invalid
+
+
+### Reset a user's password (not started)
+
+**POST:** `/v1/user/reset-password/`
+
+**Body:**
+```json
+{
+    "reset_code": "12dfg2wer6a342g23456",
+    "new_password": "newpass1"
+}
+```
+
+**Response:** None
+
+**Notes:**
+- `password`: must be at least 8 chars with at least 1 number
+- `code`: password verification codes are 20 character combinations of lowercase letters and digits
+
+
+**Status Codes:**
+- `201` if successful
+- `400` is bad data is sent
+- `404` if the reset code is invalid or expired
+
+
+### Create a trip search
+
+**POST:** `/api/v1/trip/search`
+
+**Notes:**
+- This route will be used every time a user selects a trip after a search and is on the trip's detail page. The next step would be for the user to select checkout, or some other button to move on to purchasing. This info will be saved in order to speed up the checkout process and allow the user to reference their past searches.
+- `trip_option` is a tripOption the user selected. The trip body example is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`. IMPORTANT: `trip_option` must be a Google QPX tripOption and have `kind`, `id`, `slice` and `purchase` field. The value of `kind` must be `qpxexpress#tripOption`.
+
+**Body:**
+```json
+{
+  "trip_option": {
+    "kind": "qpxexpress#tripOption",
+    "saleTotal": "USD286.20",
+    "id": "dfeVRNNDeQKQ1wRSjTu31G001",
+    "slice": [
+      {
+        "kind": "qpxexpress#sliceInfo",
+        "duration": 159,
+        "segment": [
+          {
+            "kind": "qpxexpress#segmentInfo",
+            "duration": 159,
+            "flight": {
+              "carrier": "NK",
+              "number": "847"
+            },
+            "id": "GRVECUxTw70vJ0tX",
+            "cabin": "COACH",
+            "bookingCode": "Y",
+            "bookingCodeCount": 4,
+            "marriedSegmentGroup": "0",
+            "leg": [
+              {
+                "kind": "qpxexpress#legInfo",
+                "id": "LJXwJbKqnxTa3M7W",
+                "aircraft": "320",
+                "arrivalTime": "2016-02-16T14:04-07:00",
+                "departureTime": "2016-02-16T12:25-06:00",
+                "origin": "ORD",
+                "destination": "DEN",
+                "originTerminal": "3",
+                "duration": 159,
+                "onTimePerformance": 80,
+                "mileage": 885,
+                "secure": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "qpxexpress#sliceInfo",
+        "duration": 151,
+        "segment": [
+          {
+            "kind": "qpxexpress#segmentInfo",
+            "duration": 151,
+            "flight": {
+              "carrier": "NK",
+              "number": "630"
+            },
+            "id": "G+kXUtDqIMFX4Z5l",
+            "cabin": "COACH",
+            "bookingCode": "R",
+            "bookingCodeCount": 4,
+            "marriedSegmentGroup": "1",
+            "leg": [
+              {
+                "kind": "qpxexpress#legInfo",
+                "id": "Lv8L4zSGi8WBXhSj",
+                "aircraft": "320",
+                "arrivalTime": "2016-02-17T17:06-06:00",
+                "departureTime": "2016-02-17T13:35-07:00",
+                "origin": "DEN",
+                "destination": "ORD",
+                "destinationTerminal": "3",
+                "duration": 151,
+                "onTimePerformance": 70,
+                "mileage": 885,
+                "secure": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "pricing": [
+      {
+        "saleTotal": "USD286.20",
+        "fareCalculation": "CHI NK DEN Q18.60 Q4.65 147.91YNR NK CHI Q18.60 Q4.65 45.58RNR USD 239.99 END ZP ORD DEN XT 18.01US 8.00ZP 11.20AY 9.00XF ORD4.50 DEN4.50",
+        "baseFareTotal": "USD239.99",
+        "kind": "qpxexpress#pricingInfo",
+        "saleTaxTotal": "USD46.21",
+        "latestTicketingTime": "2016-02-16T10:25-05:00",
+        "saleFareTotal": "USD239.99",
+        "ptc": "ADT",
+        "fare": [
+          {
+            "carrier": "NK",
+            "kind": "qpxexpress#fareInfo",
+            "origin": "CHI",
+            "basisCode": "YNR",
+            "destination": "DEN",
+            "id": "A+2CScErZefeLB8STqkhnLUDbuPHvoW8d2mSGczs"
+          },
+          {
+            "carrier": "NK",
+            "kind": "qpxexpress#fareInfo",
+            "origin": "DEN",
+            "basisCode": "RNR",
+            "destination": "CHI",
+            "id": "Aplj9coCfvfdtoY9NJA4IgAAPsOi/5tOnLwy7xDA"
+          }
+        ],
+        "passengers": {
+          "kind": "qpxexpress#passengerCounts",
+          "adultCount": 1
+        },
+        "tax": [
+          {
+            "code": "US",
+            "chargeType": "GOVERNMENT",
+            "kind": "qpxexpress#taxInfo",
+            "country": "US",
+            "id": "US_001",
+            "salePrice": "USD18.01"
+          },
+          {
+            "code": "AY",
+            "chargeType": "GOVERNMENT",
+            "kind": "qpxexpress#taxInfo",
+            "country": "US",
+            "id": "AY_001",
+            "salePrice": "USD11.20"
+          },
+          {
+            "code": "XF",
+            "chargeType": "GOVERNMENT",
+            "kind": "qpxexpress#taxInfo",
+            "country": "US",
+            "id": "XF",
+            "salePrice": "USD9.00"
+          },
+          {
+            "code": "ZP",
+            "chargeType": "GOVERNMENT",
+            "kind": "qpxexpress#taxInfo",
+            "country": "US",
+            "id": "ZP",
+            "salePrice": "USD8.00"
+          }
+        ],
+        "segmentPricing": [
+          {
+            "segmentId": "GRVECUxTw70vJ0tX",
+            "kind": "qpxexpress#segmentPricing",
+            "fareId": "A+2CScErZefeLB8STqkhnLUDbuPHvoW8d2mSGczs"
+          },
+          {
+            "segmentId": "G+kXUtDqIMFX4Z5l",
+            "kind": "qpxexpress#segmentPricing",
+            "fareId": "Aplj9coCfvfdtoY9NJA4IgAAPsOi/5tOnLwy7xDA"
+          }
+        ]
+      }
+    ]
+  }  
+}
+```
+
+**Response:**
+```json
+{
+    "id": 1,
+    "user": 1,
+    "round_trip": true,
+    "passenger": {
+          "kind": "qpxexpress#passengerCounts",
+          "adultCount": 1
+        },
+    "origin": "ORD",
+    "destination": "DEN",
+    "date": "2016-02-16",
+    "cabin": "COACH",
+    "departure_time": "12:25",
+    "carrier": "NK",
+    "price": "USD286.20",
+    "trip_option": {
+      "kind": "...",
+      "id": "...",
+      "saleTotal": "...",
+      "slice": "...",
+      "pricing": "..."
+    },
+    "expiration": "2016-02-16T00:00:00",
+    "timestamp": "2016-02-14T23:19:26.513620Z"
+}
+```
+
+**Status Codes:**
+- `201` if successful
+- `400` if data is in incorrect format
+- `403` if user is not authenticated
+
+
+### List all trip searches
+
+**GET:** `/api/v1/trip/search`
+
+**Notes:**
+- Returns all non-expired trip searches for the user. The trips are returned by most recent `timestamp`.
+
+**RESPONSE:**
+```json
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 3,
+      "round_trip": false,
+      "passenger": {
+        "adultCount": 1,
+        "kind": "qpxexpress#passengerCounts"
+      },
+      "origin": "DFW",
+      "destination": "OGG",
+      "date": "2016-02-22",
+      "cabin": "COACH",
+      "departure_time": "06:59",
+      "carrier": "UA",
+      "price": "USD500.50",
+      "trip_option": {"trip option dictionary"},
+      "expiration": "2016-02-22T00:00:00.000000Z",
+      "timestamp": "2016-02-19T19:52:14.466484Z",
+      "user": 1
+    },
+    {
+      "id": 2,
+      "round_trip": false,
+      "passenger": {
+        "adultCount": 1,
+        "kind": "qpxexpress#passengerCounts"
+      },
+      "origin": "DFW",
+      "destination": "OGG",
+      "date": "2016-02-22",
+      "cabin": "COACH",
+      "departure_time": "06:59",
+      "carrier": "UA",
+      "price": "USD500.50",
+      "trip_option": {"trip option dictionary"},
+      "expiration": "2016-02-22T00:00:00.000000Z",
+      "timestamp": "2016-02-19T19:30:42.588810Z",
+      "user": 1
+    }
+  ]
+}
+```
+
+**Status Codes:**
+- `200` if successful
+- `403` if user is not authenticated
+
+
+### Retrieve a trip search
+
+**GET:** `/api/v1/trip/search/:id`
+
+**RESPONSE:**
+```json
+{
+    "id": 3,
+    "round_trip": false,
+    "passenger": {
+      "adultCount": 1,
+      "kind": "qpxexpress#passengerCounts"
+    },
+    "origin": "DFW",
+    "destination": "OGG",
+    "date": "2016-02-22",
+    "cabin": "COACH",
+    "departure_time": "06:59",
+    "carrier": "UA",
+    "price": "USD500.50",
+    "trip_option": {"trip option dictionary"},
+    "expiration": "2016-02-22T00:00:00.000000Z",
+    "timestamp": "2016-02-19T19:52:14.466484Z",
+    "user": 1
+}
+```
+
+**Status Codes:**
+- `200` if successful
+- `403` if user is not authenticated
+- `404` if trip search does not exist
+
+
+### Delete a trip search
+
+**GET:** `/api/v1/trip/search/:id`
+
+**Response:** None
+
+**Status Codes:**
+- `204` if successful
+- `403` if user is not authenticated
+- `404` if trip search does not exist
+
+
+### Create a trip purchase
+
+**POST:** `/api/v1/trip/purchase`
+
+**Notes:**
+- This route will start the flight booking process: approve user's payment, create a trip, book flight through Sabre and then charge the user. The response will display the current status of the process. The process will complete once a trip_id is returned.
+
+
+### Get status of a trips's purchase
+
+**GET:** `/api/v1/trip/status`
+
+**Response:**
+```json
+{
+    "id": 1,
+    "cc_approved": true,
+    "trip_created": true,
+    "sabre_successful": true,
+    "cc_charged": true,
+    "trip_id": 1,
+    "updated": "2016-02-14T23:19:26.513620Z"
+}
+```
+
+**Status Codes:**
+- `200` if successful
+- `403` if no/incorrect token
