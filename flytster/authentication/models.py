@@ -30,7 +30,7 @@ class AuthToken(models.Model):
     def is_expired(self):
         delta = timedelta(
             days=settings.TOKEN_EXP_IN_DAYS
-            ) if self.user.email_verified else timedelta(hours=24)
+            ) if self.user.is_verified else timedelta(hours=24)
         if timezone.now() - self.timestamp < delta:
             return False
         self.delete()
