@@ -26,9 +26,19 @@ There are a few configurations managed as environment variables. In the developm
 - [Logout a user](#logout-a-user)
 - [Get the users profile](#get-the-users-profile)
 - [Update the users profile](#get-the-users-profile)
+- [Verify a users email](#verify-a-users-email)
+- [Change the users password](#change-the-users-password)
+- [Request a password reset](#request-a-password-reset)
+- [Reset a users password](#reset-a-users-password)
 
-#### Trips
-- [Search for a trip](#search-for-a-trip)
+#### Trip Searches
+- [Create a trip search](#create-a-trip-search)
+- [List all trip searches](#list-all-trip-searches)
+- [Get a trip search](#get-a-trip-search)
+- [Delete a trip search](#delete-a-trip-search)
+
+#### Trip & Status
+- [Get status of a trip](#get-status-of-a-trip)
 
 
 ## API Routes
@@ -167,7 +177,7 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `400` if incorrect data is provided
 
 
-### Verify a user's email address (not started yet)
+### Verify a users email (not started yet)
 
 **POST:** `/v1/user/verify_email/`
 
@@ -202,7 +212,7 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `409` if the email address is already verified by another user
 
 
-### Change the current user's password (not started)
+### Change the users password (not started)
 
 **POST:** `/v1/user/change-password/`
 
@@ -248,7 +258,7 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `404` if the login is invalid
 
 
-### Reset a user's password (not started)
+### Reset a users password (not started)
 
 **POST:** `/v1/user/reset-password/`
 
@@ -585,7 +595,7 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `404` if trip search does not exist
 
 
-### Create a trip purchase
+### Create a trip purchase (not started)
 
 **POST:** `/api/v1/trip/purchase`
 
@@ -593,7 +603,7 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - This route will start the flight booking process: approve user's payment, create a trip, book flight through Sabre and then charge the user. The response will display the current status of the process. The process will complete once a trip_id is returned.
 
 
-### Get status of a trips's purchase
+### Get status of a trip (not started)
 
 **GET:** `/api/v1/trip/status`
 
