@@ -7,16 +7,23 @@ from authentication.models import AuthToken
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, email, password):
-        user = self.model(email=email)
+    def create_user(self, first_name, last_name, email, password):
+        user = self.model(
+            first_name=first_name,
+            last_name=last_name, 
+            email=email)
         user.set_password(password)
         user.save(using=self._db)
 
         AuthToken.objects.create(user=user)
         return user
 
-    def create_superuser(self, email, password):
-        user = self.create_user(email=email, password=password)
+    def create_superuser(self, first_name, last_name, email, password):
+        user = self.create_user(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=password)
         user.is_admin = True
         user.save(using=self._db)
         return user
