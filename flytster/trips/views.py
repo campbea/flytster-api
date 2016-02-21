@@ -7,52 +7,56 @@ from rest_framework import generics, status, views
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
-from .models import Trip, TripSearch
+from .models import Trip, TripStatus
 from .permissions import IsOwner
-from .serializers import TripSearchPostSerializer, TripSearchSerializer
-from .utils import create_trip_search_from_qpx_trip_option, InvalidTripOption
+from .serializers import TripPostSerializer, TripSerializer
+from .utils import create_flights_from_trip_option_data, InvalidTripOption
 
 
-class TripSearchListCreate(generics.ListCreateAPIView):
+class TripListCreateView(generics.ListCreateAPIView):
     """
-    POST: Create a TripSearch instance from a user's selected flight data.
-    GET:  Get all TripSearch instances that are not expired
+    POST: Create a Trip instance from a user's selected flight.
+    GET:  Get all Trip instances that are selected and not expired
     """
 
-    model = TripSearch
+    model = Trip
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
-            return TripSearchPostSerializer
-        return TripSearchSerializer
+            return TripPostSerializer
+        return TripSerializer
 
     def get_queryset(self):
-        return self.model.objects.filter(
-            user=self.request.user).filter(expiration__gt=datetime.date.today())
+        return self.model.objects.filter(user=self.request.user).filter(
+            status__is_selected=True).filter(status__is_expired=False)
 
     def post(self, request):
-        new_trip_search = self.get_serializer_class()(data=request.data)
+        new_trip = self.get_serializer_class()(data=request.data)
 
-        if not new_trip_search.is_valid():
-            return Response(new_trip_search.errors, status=status.HTTP_400_BAD_REQUEST)
+        if not new_trip.is_valid():
+            return Response(new_trip.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        trip = Trip.objects.create(
+            user = request.user,
+            status = TripStatus.objects.create(),
+            data = new_trip.validated_data['trip_option'])
 
         try:
-            trip_search = create_trip_search_from_qpx_trip_option(
-                request.user, new_trip_search.validated_data['trip_option'])
+             # This takes care of validation and if there is an error the trip is deleted
+            create_flights_from_trip_option_data(trip)
         except InvalidTripOption as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        result = TripSearchSerializer(trip_search)
+        result = TripSerializer(trip)
         return Response(result.data, status=status.HTTP_201_CREATED)
 
 
-class TripSearchRetrieveDestroy(generics.RetrieveDestroyAPIView):
+class TripRetrieveView(generics.RetrieveAPIView):
     """
     GET: Retrieve a specific TripSearch instance
-    DELETE: Delete a TripSearch instance
     """
 
-    model = TripSearch
-    serializer_class = TripSearchSerializer
+    model = Trip
+    serializer_class = TripSerializer
     permission_classes = (IsOwner,)
-    queryset = TripSearch.objects.all()
+    queryset = Trip.objects.all()

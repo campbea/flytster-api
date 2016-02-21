@@ -1,38 +1,43 @@
 import datetime
-import json
-import requests
 
-from django.conf import settings
-
-from .models import TripSearch
-
+from .models import TripPrice, Flight
 
 class InvalidTripOption(Exception):
     pass
 
 
-def create_trip_search_from_qpx_trip_option(user, data):
+def create_flights_from_trip_option_data(trip):
     '''
-    Create a TripSearch instance from a Google QPX tripOption
+    Create a Flights from a Google QPX tripOption
     '''
+
     try:
-        departure_date = data['slice'][0]['segment'][0]['leg'][0]['departureTime'][0:10]
+        passenger_dict = trip.data['pricing'][0]['passengers']
+        passengers = 0
+        for key, value in passenger_dict.items():
+            if isinstance(value, int):
+                passengers += value
 
-        trip_search = TripSearch.objects.create(
-            user = user,
-            round_trip = False if len(data['slice']) == 1 else True,
-            passenger = data['pricing'][0]['passengers'],
-            origin = data['slice'][0]['segment'][0]['leg'][0]['origin'],
-            destination = data['slice'][0]['segment'][-1]['leg'][-1]['destination'],
-            date = departure_date,
-            cabin = data['slice'][0]['segment'][0]['cabin'],
-            departure_time = data['slice'][0]['segment'][0]['leg'][0]['departureTime'][11:16],
-            carrier = data['slice'][0]['segment'][0]['flight']['carrier'],
-            price = data['saleTotal'],
-            trip_option = data,
-            expiration = datetime.datetime.strptime(departure_date, '%Y-%m-%d')
-        )
+        for c, slice_item in enumerate(trip.data['slice']):
+            for segment_item in trip.data['slice'][c]['segment']:
+                Flight.objects.create(
+                    trip=trip,
+                    carrier = segment_item['flight']['carrier'],
+                    number = segment_item['flight']['number'],
+                    cabin = segment_item['cabin'],
+                    booking_code = segment_item['bookingCode'],
+                    married = segment_item['marriedSegmentGroup'],
+                    aircraft = segment_item['leg'][0]['aircraft'],
+                    arrival_time = segment_item['leg'][0]['arrivalTime'],
+                    departure_time = segment_item['leg'][0]['departureTime'],
+                    origin = segment_item['leg'][0]['origin'],
+                    destination = segment_item['leg'][0]['destination'],
+                    passengers = passengers
+                )
+
+        price = float(trip.data['saleTotal'][3:])
+        TripPrice.objects.create(trip=trip, price=price)
+
     except Exception as e:
-        raise InvalidTripOption('Detail: {}'.format(e))
-
-    return trip_search
+        trip.delete()
+        raise InvalidTripOption(e)

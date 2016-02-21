@@ -40,9 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'users',
     'authentication',
+    'credits',
     'trips',
+    'users',
 ]
 
 REST_FRAMEWORK = {
@@ -143,3 +144,6 @@ TOKEN_EXP_IN_DAYS = 7
 # Google API
 SERVER_KEY = os.getenv('SERVER_KEY', None)
 GOOGLE_TRIP_SEARCH_URL = 'https://www.googleapis.com/qpxExpress/v1/trips/search'
+
+# Stripe API
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', None)

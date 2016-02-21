@@ -283,13 +283,13 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `404` if the reset code is invalid or expired
 
 
-### Create a trip search
+### Create a trip
 
-**POST:** `/api/v1/trip/search`
+**POST:** `/api/v1/trip/`
 
 **Notes:**
 - This route will be used every time a user selects a trip after a search and is on the trip's detail page. The next step would be for the user to select checkout, or some other button to move on to purchasing. This info will be saved in order to speed up the checkout process and allow the user to reference their past searches.
-- `trip_option` is a tripOption the user selected. The trip body example is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`. IMPORTANT: `trip_option` must be a Google QPX tripOption and have `kind`, `id`, `slice` and `purchase` field. The value of `kind` must be `qpxexpress#tripOption`.
+- `trip_option` is the tripOption a user selected. The trip body example is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`. IMPORTANT: `trip_option` must be a Google QPX tripOption and have `kind`, `id`, `slice` and `purchase` field. The value of `kind` must be `qpxexpress#tripOption`.
 
 **Body:**
 ```json
@@ -459,27 +459,17 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 {
     "id": 1,
     "user": 1,
-    "round_trip": true,
-    "passenger": {
-          "kind": "qpxexpress#passengerCounts",
-          "adultCount": 1
-        },
-    "origin": "ORD",
-    "destination": "DEN",
-    "date": "2016-02-16",
-    "cabin": "COACH",
-    "departure_time": "12:25",
-    "carrier": "NK",
-    "price": "USD286.20",
-    "trip_option": {
-      "kind": "...",
-      "id": "...",
-      "saleTotal": "...",
-      "slice": "...",
-      "pricing": "..."
+    "cheapest_price": 50.5,
+    "status": {
+      "is_selected": true,
+      "is_confirmed": false,
+      "is_sabre_successful": false,
+      "is_purchased": false,
+      "is_expired": false,
+      "updated": "2016-02-21T04:59:22.173893Z"
     },
-    "expiration": "2016-02-16T00:00:00",
-    "timestamp": "2016-02-14T23:19:26.513620Z"
+    "data": {"..."},
+    "timestamp": "2016-02-21T04:59:22.179752Z"
 }
 ```
 
@@ -489,12 +479,12 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `403` if user is not authenticated
 
 
-### List all trip searches
+### List all trips
 
-**GET:** `/api/v1/trip/search`
+**GET:** `/api/v1/trip/`
 
 **Notes:**
-- Returns all non-expired trip searches for the user. The trips are returned by most recent `timestamp`.
+- Returns all non-expired trips for the user. The trips are returned by most recent `timestamp`.
 
 **RESPONSE:**
 ```json
@@ -504,42 +494,34 @@ Deletes the current auth token for the user; `login` to obtain a new one.
   "previous": null,
   "results": [
     {
-      "id": 3,
-      "round_trip": false,
-      "passenger": {
-        "adultCount": 1,
-        "kind": "qpxexpress#passengerCounts"
+      "id": 1,
+      "user": 1,
+      "cheapest_price": 50.5,
+      "status": {
+        "is_selected": true,
+        "is_confirmed": false,
+        "is_sabre_successful": false,
+        "is_purchased": false,
+        "is_expired": false,
+        "updated": "2016-02-21T04:59:22.173893Z"
       },
-      "origin": "DFW",
-      "destination": "OGG",
-      "date": "2016-02-22",
-      "cabin": "COACH",
-      "departure_time": "06:59",
-      "carrier": "UA",
-      "price": "USD500.50",
-      "trip_option": {"trip option dictionary"},
-      "expiration": "2016-02-22T00:00:00.000000Z",
-      "timestamp": "2016-02-19T19:52:14.466484Z",
-      "user": 1
+      "data": {"..."},
+      "timestamp": "2016-02-21T04:59:22.179752Z"
     },
     {
-      "id": 2,
-      "round_trip": false,
-      "passenger": {
-        "adultCount": 1,
-        "kind": "qpxexpress#passengerCounts"
+      "id": 1,
+      "user": 1,
+      "cheapest_price": 50.5,
+      "status": {
+        "is_selected": true,
+        "is_confirmed": false,
+        "is_sabre_successful": false,
+        "is_purchased": false,
+        "is_expired": false,
+        "updated": "2016-02-21T04:59:22.173893Z"
       },
-      "origin": "DFW",
-      "destination": "OGG",
-      "date": "2016-02-22",
-      "cabin": "COACH",
-      "departure_time": "06:59",
-      "carrier": "UA",
-      "price": "USD500.50",
-      "trip_option": {"trip option dictionary"},
-      "expiration": "2016-02-22T00:00:00.000000Z",
-      "timestamp": "2016-02-19T19:30:42.588810Z",
-      "user": 1
+      "data": {"..."},
+      "timestamp": "2016-02-21T04:59:22.179752Z"
     }
   ]
 }
@@ -550,47 +532,31 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `403` if user is not authenticated
 
 
-### Retrieve a trip search
+### Retrieve a trip
 
-**GET:** `/api/v1/trip/search/:id`
+**GET:** `/api/v1/trip/:id`
 
 **RESPONSE:**
 ```json
 {
-    "id": 3,
-    "round_trip": false,
-    "passenger": {
-      "adultCount": 1,
-      "kind": "qpxexpress#passengerCounts"
+    "id": 1,
+    "user": 1,
+    "cheapest_price": 50.5,
+    "status": {
+      "is_selected": true,
+      "is_confirmed": false,
+      "is_sabre_successful": false,
+      "is_purchased": false,
+      "is_expired": false,
+      "updated": "2016-02-21T04:59:22.173893Z"
     },
-    "origin": "DFW",
-    "destination": "OGG",
-    "date": "2016-02-22",
-    "cabin": "COACH",
-    "departure_time": "06:59",
-    "carrier": "UA",
-    "price": "USD500.50",
-    "trip_option": {"trip option dictionary"},
-    "expiration": "2016-02-22T00:00:00.000000Z",
-    "timestamp": "2016-02-19T19:52:14.466484Z",
-    "user": 1
+    "data": {"..."},
+    "timestamp": "2016-02-21T04:59:22.179752Z"
 }
 ```
 
 **Status Codes:**
 - `200` if successful
-- `403` if user is not authenticated
-- `404` if trip search does not exist
-
-
-### Delete a trip search
-
-**GET:** `/api/v1/trip/search/:id`
-
-**Response:** None
-
-**Status Codes:**
-- `204` if successful
 - `403` if user is not authenticated
 - `404` if trip search does not exist
 
