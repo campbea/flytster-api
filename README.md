@@ -20,7 +20,7 @@ There are a few configurations managed as environment variables. In the developm
 
 ## API Table of Contents
 
-#### Users & profiles
+#### Users
 - [Register a new user](#register-a-new-user)
 - [Login a user](#login-a-user)
 - [Logout a user](#logout-a-user)
@@ -31,7 +31,7 @@ There are a few configurations managed as environment variables. In the developm
 - [Request a password reset](#request-a-password-reset)
 - [Reset a users password](#reset-a-users-password)
 
-#### Trip Searches
+#### Trips
 - [Create a trip search](#create-a-trip-search)
 - [List all trip searches](#list-all-trip-searches)
 - [Get a trip search](#get-a-trip-search)
@@ -42,6 +42,9 @@ There are a few configurations managed as environment variables. In the developm
 
 
 ## API Routes
+
+
+### Users
 
 
 #### Register a new user
@@ -290,6 +293,7 @@ There are a few configurations managed as environment variables. In the developm
 - `404` if the token is invalid or expired
 
 
+### Trips
 
 
 #### Create a trip
