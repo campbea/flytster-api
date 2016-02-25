@@ -25,7 +25,7 @@ There are a few configurations managed as environment variables. In the developm
 - [Login a user](#login-a-user)
 - [Logout a user](#logout-a-user)
 - [Get the users profile](#get-the-users-profile)
-- [Update the users profile](#get-the-users-profile)
+- [Update the users profile](#update-the-users-profile)
 - [Verify a users email](#verify-a-users-email)
 - [Change the users password](#change-the-users-password)
 - [Request a password reset](#request-a-password-reset)
@@ -62,8 +62,7 @@ There are a few configurations managed as environment variables. In the developm
 - `email`: user's email address, must be unique (string)
 - `password`: must be at least 8 chars with at least 1 number (string)
 - The new user will receive an email containing a link to verify (verification token is in link)
-
-Registering a user will return a valid API auth token.
+- Registering a user will return a valid API auth token.
 
 **Response:**
 ```json
@@ -120,7 +119,7 @@ Registering a user will return a valid API auth token.
 **DELETE:** `/api/v1/user/logout`
 
 **Notes:**
-Deletes the current auth token for the user; `login` to obtain a new one.
+- Deletes the current auth token for the user.
 
 **Response:** None
 
@@ -289,6 +288,8 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `200` if successful
 - `400` is bad data is sent
 - `404` if the token is invalid or expired
+
+
 
 
 ### Create a trip
