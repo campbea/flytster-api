@@ -57,3 +57,61 @@ class TokenAuthentication(BaseAuthentication):
             raise AuthenticationFailed()
 
         return (token.user, token.token)
+
+
+class InvalidTokenError(Exception):
+
+    pass
+
+
+class VerificationToken(models.Model):
+    """
+    This is an abstract model used to verify email and password tokens.
+    Each token will expire in 7 days if not used.
+    """
+
+    token = models.CharField(max_length=20, unique=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        abstract = True
+
+    def __unicode__(self):
+        return self.user.email
+
+    @property
+    def is_expired(self):
+        if timezone.now() - self.timestamp < timedelta(days=7):
+            return False
+        self.delete()
+        return True
+
+    def generate_token(self):
+        return uuid4().hex[:20]
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            token = self.generate_token()
+            while self.__class__.objects.filter(token=token).exists():
+                token = self.generate_token()
+            self.token = token
+        super(VerificationToken, self).save(*args, **kwargs)
+
+
+class EmailToken(VerificationToken):
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='email_token')
+    email = models.EmailField(max_length=100)
+
+    class Meta:
+        verbose_name = u'EmailToken'
+        verbose_name_plural = u'EmailTokens'
+
+
+class PasswordToken(VerificationToken):
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='password_token')
+
+    class Meta:
+        verbose_name = u'PasswordToken'
+        verbose_name_plural = u'PasswordTokens'

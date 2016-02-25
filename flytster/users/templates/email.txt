@@ -1,0 +1,5 @@
+{{ header }}
+
+{{ text_content }}
+
+{{ link_text }}: {{ link }}

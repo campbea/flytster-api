@@ -54,15 +54,14 @@ There are a few configurations managed as environment variables. In the developm
     "first_name": "Cam",
     "last_name": "Newton",
     "email": "test@test.com",
-    "password": "password1",
-    "is_verified": false,
-    "timestamp": "2016-02-14T23:19:26.513620Z"
+    "password": "password1"
 }
 ```
 
 **Notes:**
 - `email`: user's email address, must be unique (string)
 - `password`: must be at least 8 chars with at least 1 number (string)
+- The new user will receive an email containing a link to verify (verification token is in link)
 
 Registering a user will return a valid API auth token.
 
@@ -73,7 +72,9 @@ Registering a user will return a valid API auth token.
     "first_name": "Cam",
     "last_name": "Newton",
     "email": "test@test.com",
-    "token": "6ba2103f4ac8a9712ffb2a689b0e"
+    "token": "6ba2103f4ac8a9712ffb2a689b0e",
+    "is_verified": false,
+    "timestamp": "2016-02-14T23:19:26.513620Z"
 }
 ```
 
@@ -111,7 +112,7 @@ Registering a user will return a valid API auth token.
 **Status Codes:**
 - `201` if successful
 - `400` if invalid data is sent
-- `401` if email and/or password are incorrect
+- `403` if email and/or password are incorrect
 
 
 ### Logout a user
@@ -138,6 +139,7 @@ Deletes the current auth token for the user; `login` to obtain a new one.
     "first_name": "Cam",
     "last_name": "Newton",
     "email": "test@test.com",
+    "email_pending": null,
     "is_verified": false,
     "timestamp": "2016-02-14T23:19:26.513620Z"
 }
@@ -156,9 +158,13 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 ```json
 {
     "first_name": "Tom",
-    "last_name": "Brady"
+    "last_name": "Brady",
+    "email": "bradytime@gmail.com"
 }
 ```
+
+**Notes:**
+- If the user updates their email the user will receive an email containing a link to verify the new email (verification token is in link). Until the user verifies their token, the updated email will remain in email_pending.
 
 **Response:**
 ```json
@@ -167,6 +173,7 @@ Deletes the current auth token for the user; `login` to obtain a new one.
     "first_name": "Tom",
     "last_name": "Brady",
     "email": "test@test.com",
+    "email_pending": "braddytime@gmail.com"
     "is_verified": false,
     "timestamp": "2016-02-14T23:19:26.513620Z"
 }
@@ -175,9 +182,10 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 **Status Codes:**
 - `200` if successful
 - `400` if incorrect data is provided
+- `403` if user is not authorized
 
 
-### Verify a users email (not started yet)
+### Verify a users email
 
 **POST:** `/v1/user/verify_email/`
 
@@ -200,6 +208,7 @@ Deletes the current auth token for the user; `login` to obtain a new one.
     "first_name": "Tom",
     "last_name": "Brady",
     "email": "test@test.com",
+    "email_pending": null,
     "is_verified": true,
     "timestamp": "2016-02-14T23:19:26.513620Z"
 }
@@ -209,10 +218,9 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 - `200` if successful
 - `400` is bad data is sent
 - `404` if the code is invalid or expired
-- `409` if the email address is already verified by another user
 
 
-### Change the users password (not started)
+### Change the users password
 
 **POST:** `/v1/user/change-password/`
 
@@ -232,40 +240,40 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 
 
 **Status Codes:**
-- `201` if successful
+- `200` if successful
 - `400` if invalid data is provided, or `old_password` doesn't match
 
 
-### Request a password reset (not started)
+### Request a password reset
 
 **POST:** `/v1/user/request-password/`
 
 **Body:**
 ```json
 {
-    "login": "test@test.com",
+    "email": "test@test.com",
 }
 ```
 
 **Response:** None
 
 **Notes:**
-`login` can be any valid email address. The reset code will be emailed to the user.
+- `email` can be any valid email address. The reset code will be emailed to the user.
 
 **Status Codes:**
 - `200` if successful
 - `400` is bad data is sent
-- `404` if the login is invalid
+- `404` if the email is not found
 
 
-### Reset a users password (not started)
+### Reset a users password
 
 **POST:** `/v1/user/reset-password/`
 
 **Body:**
 ```json
 {
-    "reset_code": "12dfg2wer6a342g23456",
+    "token": "12dfg2wer6a342g23456",
     "new_password": "newpass1"
 }
 ```
@@ -274,13 +282,13 @@ Deletes the current auth token for the user; `login` to obtain a new one.
 
 **Notes:**
 - `password`: must be at least 8 chars with at least 1 number
-- `code`: password verification codes are 20 character combinations of lowercase letters and digits
+- `token`: verification token is a 20 character combinations of lowercase letters and digits
 
 
 **Status Codes:**
-- `201` if successful
+- `200` if successful
 - `400` is bad data is sent
-- `404` if the reset code is invalid or expired
+- `404` if the token is invalid or expired
 
 
 ### Create a trip

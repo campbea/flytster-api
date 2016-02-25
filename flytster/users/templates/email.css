@@ -1,0 +1,76 @@
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+html,
+body,
+table,
+td {
+    font-family: Roboto, sans-serif;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table.wrapper {
+    width: 600px;
+    max-width: 100%;
+    margin: auto;
+}
+
+table.main {
+    width: 100%;
+    display: block;
+}
+
+table.main td {
+    padding: 20px;
+}
+
+h1 {
+    font-size: 22px;
+    color: #FF3D7F;
+    margin: 0;
+    padding-bottom: 20px;
+    font-weight: normal;
+}
+
+p {
+    margin: 0 0 10px 0;
+}
+
+table.button,
+table.button td {
+    padding-top: 10px;
+    background: #3FB8AF;
+    font-size: 18px;
+    text-align: center;
+}
+
+table.button a,
+table.button td a {
+    color: #FFF;
+    text-decoration: none;
+}
+
+table.button td:hover {
+    background-color: #3FB8AF;
+}
+
+table.button {
+    margin: auto;
+}
+
+table.button td {
+    padding: 10px 20px;
+}
+
+
+@media all and ( max-width: 600px ) {
+    table.wrapper {
+        width: 100% !important;
+    }
+}

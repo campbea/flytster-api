@@ -27,3 +27,9 @@ def valid_password(value):
         return
     raise serializers.ValidationError(
         'Passwords must be at least 8 characters and contain at least one digit.')
+
+
+def valid_verification_token(value):
+    if re.match(r'^[abcdefghjkmnopqrstuvwxyz0123456789]{20}$', value):
+        return
+    raise serializers.ValidationError('{} is not a valid verification token.'.format(value))

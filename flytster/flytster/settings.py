@@ -22,14 +22,11 @@ assert SECRET_KEY
 
 DEBUG = True if os.getenv('DEBUG').lower() == 'true' else False
 
-if DEBUG:
-    PRODUCTION = False
-else:
-    PRODUCTION = True if os.getenv('PRODUCTION').lower() == 'true' else False
+TESTING = 'test' in sys.argv
 
 ALLOWED_HOSTS = ['*']
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.FlytsterUser'
 
 # Application definition
 INSTALLED_APPS = [
@@ -141,9 +138,29 @@ STATIC_URL = '/static/'
 
 TOKEN_EXP_IN_DAYS = 7
 
+# Flytster info
+if TESTING:
+    EMAIL_HOST = "localhost"
+    EMAIL_PORT = "1025"
+    EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', None)
+
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', None)
+
 # Google API
 SERVER_KEY = os.getenv('SERVER_KEY', None)
 GOOGLE_TRIP_SEARCH_URL = 'https://www.googleapis.com/qpxExpress/v1/trips/search'
 
 # Stripe API
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', None)
+
+# Sabre API
+SABRE_TESTING_URL = "https://sws3-crt.cert.sabre.com"
+SABRE_PRODUCTION_URL = "https://webservices3.sabre.com"
+SABRE_USERNAME = os.getenv('SABRE_USERNAME', None)
+SABRE_PASSWORD = os.getenv('SABRE_PASSWORD', None)
