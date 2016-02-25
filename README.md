@@ -44,7 +44,7 @@ There are a few configurations managed as environment variables. In the developm
 ## API Routes
 
 
-### Register a new user
+#### Register a new user
 
 **POST:** `/api/v1/user/register`
 
@@ -83,7 +83,7 @@ There are a few configurations managed as environment variables. In the developm
 - `409` if the email already exist
 
 
-### Login a user
+#### Login a user
 
 **POST:** `/api/v1/user/login`
 
@@ -114,7 +114,7 @@ There are a few configurations managed as environment variables. In the developm
 - `403` if email and/or password are incorrect
 
 
-### Logout a user
+#### Logout a user
 
 **DELETE:** `/api/v1/user/logout`
 
@@ -127,7 +127,7 @@ There are a few configurations managed as environment variables. In the developm
 - `204` if successful
 
 
-### Get the users profile
+#### Get the users profile
 
 **GET:** `/api/v1/user/`
 
@@ -149,7 +149,7 @@ There are a few configurations managed as environment variables. In the developm
 - `403` if no/incorrect token
 
 
-### Update the users profile
+#### Update the users profile
 
 **PATCH:** `/api/v1/user`
 
@@ -172,7 +172,7 @@ There are a few configurations managed as environment variables. In the developm
     "first_name": "Tom",
     "last_name": "Brady",
     "email": "test@test.com",
-    "email_pending": "braddytime@gmail.com"
+    "email_pending": "braddytime@gmail.com",
     "is_verified": false,
     "timestamp": "2016-02-14T23:19:26.513620Z"
 }
@@ -184,7 +184,7 @@ There are a few configurations managed as environment variables. In the developm
 - `403` if user is not authorized
 
 
-### Verify a users email
+#### Verify a users email
 
 **POST:** `/v1/user/verify_email/`
 
@@ -219,7 +219,7 @@ There are a few configurations managed as environment variables. In the developm
 - `404` if the code is invalid or expired
 
 
-### Change the users password
+#### Change the users password
 
 **POST:** `/v1/user/change-password/`
 
@@ -243,7 +243,7 @@ There are a few configurations managed as environment variables. In the developm
 - `400` if invalid data is provided, or `old_password` doesn't match
 
 
-### Request a password reset
+#### Request a password reset
 
 **POST:** `/v1/user/request-password/`
 
@@ -265,7 +265,7 @@ There are a few configurations managed as environment variables. In the developm
 - `404` if the email is not found
 
 
-### Reset a users password
+#### Reset a users password
 
 **POST:** `/v1/user/reset-password/`
 
@@ -292,7 +292,7 @@ There are a few configurations managed as environment variables. In the developm
 
 
 
-### Create a trip
+#### Create a trip
 
 **POST:** `/api/v1/trip/`
 
@@ -488,7 +488,7 @@ There are a few configurations managed as environment variables. In the developm
 - `403` if user is not authenticated
 
 
-### List all trips
+#### List all trips
 
 **GET:** `/api/v1/trip/`
 
@@ -541,7 +541,7 @@ There are a few configurations managed as environment variables. In the developm
 - `403` if user is not authenticated
 
 
-### Retrieve a trip
+#### Retrieve a trip
 
 **GET:** `/api/v1/trip/:id`
 
@@ -570,7 +570,7 @@ There are a few configurations managed as environment variables. In the developm
 - `404` if trip search does not exist
 
 
-### Create a trip purchase (not started)
+#### Create a trip purchase (not started)
 
 **POST:** `/api/v1/trip/purchase`
 
@@ -578,7 +578,7 @@ There are a few configurations managed as environment variables. In the developm
 - This route will start the flight booking process: approve user's payment, create a trip, book flight through Sabre and then charge the user. The response will display the current status of the process. The process will complete once a trip_id is returned.
 
 
-### Get status of a trip (not started)
+#### Get status of a trip (not started)
 
 **GET:** `/api/v1/trip/status`
 
