@@ -11,7 +11,6 @@ from .models import FlytsterUser
 from .serializers import (RegisterUserSerializer, LoginSerializer,
     UserSerializer, UserWithTokenSerializer, VerifyTokenSerializer,
     ChangePasswordSerializer, RequestPasswordResetSerializer, ResetPasswordSerializer)
-from .validators import is_email
 
 
 class RegisterUser(views.APIView):
@@ -23,9 +22,7 @@ class RegisterUser(views.APIView):
 
     def post(self, request):
         new_user = RegisterUserSerializer(data=request.data)
-
-        if not new_user.is_valid():
-            return Response(new_user.errors, status=status.HTTP_400_BAD_REQUEST)
+        new_user.is_valid(raise_exception=True)
 
         try:
             user = FlytsterUser.objects.create_user(
@@ -49,9 +46,7 @@ class LoginUser(views.APIView):
 
     def post(self, request):
         login = LoginSerializer(data=request.data)
-
-        if not login.is_valid():
-            return Response(login.errors, status=status.HTTP_400_BAD_REQUEST)
+        login.is_valid(raise_exception=True)
 
         try:
             user = FlytsterUser.objects.get(email__iexact=login.validated_data['email'])
@@ -100,9 +95,7 @@ class VerifyUserEmail(views.APIView):
 
     def post(self, request):
         token = VerifyTokenSerializer(data=request.data)
-
-        if not token.is_valid():
-            return Response(token.errors, status=status.HTTP_400_BAD_REQUEST)
+        token.is_valid(raise_exception=True)
 
         try:
             request.user.verify_email_token(token.validated_data['token'])
@@ -120,9 +113,7 @@ class ChangePassword(views.APIView):
 
     def post(self, request):
         passwords = ChangePasswordSerializer(data=request.data)
-
-        if not passwords.is_valid():
-            return Response(passwords.errors, status=status.HTTP_400_BAD_REQUEST)
+        passwords.is_valid(raise_exception=True)
 
         if not request.user.check_password(passwords.validated_data['old_password']):
             return Response(
@@ -144,9 +135,7 @@ class RequestPasswordReset(views.APIView):
 
     def post(self, request):
         user_email = RequestPasswordResetSerializer(data=request.data)
-
-        if not user_email.is_valid():
-            return Response(user_email.errors, status=status.HTTP_400_BAD_REQUEST)
+        user_email.is_valid(raise_exception=True)
 
         try:
             user = FlytsterUser.objects.get(email__iexact=user_email.validated_data['email'])
@@ -171,9 +160,7 @@ class ResetPassword(views.APIView):
 
     def post(self, request):
         reset_data = ResetPasswordSerializer(data=request.data)
-
-        if not reset_data.is_valid():
-            return Response(reset_data.errors, status=status.HTTP_400_BAD_REQUEST)
+        reset_data.is_valid(raise_exception=True)
 
         try:
             token = PasswordToken.objects.select_related(

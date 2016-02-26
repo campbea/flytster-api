@@ -1,7 +1,24 @@
+import re
+
 from rest_framework import serializers, status
 
 from .models import FlytsterUser
-from .validators import valid_password, valid_verification_token
+
+
+# Validators
+def valid_password(value):
+    long_enough = len(value) >= 8
+    contains_digit = bool(re.search(r'[\d]', value))
+    if long_enough and contains_digit:
+        return
+    raise serializers.ValidationError(
+        'Passwords must be at least 8 characters and contain at least one digit.')
+
+
+def valid_verification_token(value):
+    if re.match(r'^[abcdefghjkmnopqrstuvwxyz0123456789]{20}$', value):
+        return
+    raise serializers.ValidationError('{} is not a valid verification token.'.format(value))
 
 
 # Custom always-lowercase email field

@@ -31,6 +31,13 @@ There are a few configurations managed as environment variables. In the developm
 - [Request a password reset](#request-a-password-reset)
 - [Reset a users password](#reset-a-users-password)
 
+#### Passengers
+- [Create a passenger](#create-a-passenger)
+- [List all passengers](#list-all-passengers)
+- [Get a passenger](#get-a-passenger)
+- [Update a passenger](#update-a-passenger)
+- [Delete a passenger](#delete-a-passenger)
+
 #### Trips
 - [Create a trip search](#create-a-trip-search)
 - [List all trip searches](#list-all-trip-searches)
@@ -45,7 +52,7 @@ There are a few configurations managed as environment variables. In the developm
 
 
 ### Users
-
+Flytster users only require an email to create an account. After creating an account, a user will have to verify their email address by clicking a link. Process for a verified user: Find a flight -> Add all of the passengers information -> Confirm booking -> Complete payment.
 
 #### Register a new user
 
@@ -166,6 +173,7 @@ There are a few configurations managed as environment variables. In the developm
 ```
 
 **Notes:**
+- A user cannot update their profile until `is_verified` is true
 - If the user updates their email the user will receive an email containing a link to verify the new email (verification token is in link). Until the user verifies their token, the updated email will remain in email_pending.
 
 **Response:**
@@ -176,7 +184,7 @@ There are a few configurations managed as environment variables. In the developm
     "last_name": "Brady",
     "email": "test@test.com",
     "email_pending": "braddytime@gmail.com",
-    "is_verified": false,
+    "is_verified": true,
     "timestamp": "2016-02-14T23:19:26.513620Z"
 }
 ```
@@ -184,7 +192,7 @@ There are a few configurations managed as environment variables. In the developm
 **Status Codes:**
 - `200` if successful
 - `400` if incorrect data is provided
-- `403` if user is not authorized
+- `403` if user is not authorized or verified
 
 
 #### Verify a users email
@@ -197,8 +205,6 @@ There are a few configurations managed as environment variables. In the developm
     "code": "12dfg2wer6a342g23456",
 }
 ```
-
-**Response:** None
 
 **Notes:**
 - `code`: Email verification codes are 20 character combinations of lowercase letters and digits
@@ -234,12 +240,11 @@ There are a few configurations managed as environment variables. In the developm
 }
 ```
 
-**Response:** None
-
 **Notes:**
 - `old_password`: must be at least 8 chars with at least 1 number
 - `new_password`: must be at least 8 chars with at least 1 number
 
+**Response:** None
 
 **Status Codes:**
 - `200` if successful
@@ -257,10 +262,10 @@ There are a few configurations managed as environment variables. In the developm
 }
 ```
 
-**Response:** None
-
 **Notes:**
 - `email` can be any valid email address. The reset code will be emailed to the user.
+
+**Response:** None
 
 **Status Codes:**
 - `200` if successful
@@ -280,17 +285,176 @@ There are a few configurations managed as environment variables. In the developm
 }
 ```
 
-**Response:** None
-
 **Notes:**
 - `password`: must be at least 8 chars with at least 1 number
 - `token`: verification token is a 20 character combinations of lowercase letters and digits
 
+**Response:** None
 
 **Status Codes:**
 - `200` if successful
 - `400` is bad data is sent
 - `404` if the token is invalid or expired
+
+
+### Passengers
+Passengers are all of the individuals who will be flying on the purchased trip. Their full name must be exactly how it is on their government id. Their phone is required just in case we need to contact them. For each trip, a passengers phone and birthdate must be unique together to ensure that the same passenger was not added multiple times.
+
+
+#### Create a passenger
+
+**POST:** `/api/v1/passenger/`
+
+**Body:**
+```json
+{
+    "trip_id": 1,
+    "first_name": "Tom",
+    "middle_name": "Edward Patrick",
+    "last_name": "Brady",
+    "phone": "1234567890",
+    "gender": "M",
+    "birthdate": "1111-11-11"
+}
+```
+
+**Notes:**
+- `middle_name`: Not required
+- `phone`: A ten-digit US phone number as string
+- `gender`: Choices are `M` or `F`
+- `birthdate`: ISO format date string `YYYY-MM-DD`
+- `trip_id`, `phone` and `birthdate` must be unique together. This is to prevent a user inputing the same passenger twice. However, a user can input a contact phone number multiple times for different passengers.
+
+**Response:**
+```json
+{
+    "id": 7,
+    "user": 1,
+    "trip": 1,
+    "first_name": "Tom",
+    "middle_name": "Edward Patrick",
+    "last_name": "Brady",
+    "phone": "1234567890",
+    "gender": "M",
+    "birthdate": "1111-11-11",
+    "timestamp": "2016-02-26T16:56:03.989179Z"
+}
+```
+
+**Status Codes:**
+- `201` if successfully created
+- `400` if incorrect data is provided
+- `409` if passenger with `phone` and `birthdate` exists for this trip
+
+
+#### List all passengers
+
+**GET:** `/api/v1/passenger/`
+
+**NOTES:**
+- This will return a list of all unique passengers based on their `phone` and `birthdate`
+
+**Response:**
+```json
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "user": 1,
+      "trip": 1,
+      "first_name": "Peyton",
+      "middle_name": "",
+      "last_name": "Manning",
+      "phone": "1234567890",
+      "gender": "M",
+      "birthdate": "1111-11-11",
+      "timestamp": "2016-02-26T16:56:03.989179Z"
+    },
+    {
+      "id": 2,
+      "user": 1,
+      "trip": 1,
+      "first_name": "Eli",
+      "middle_name": "",
+      "last_name": "Manning",
+      "phone": "1234567890",
+      "gender": "M",
+      "birthdate": "2222-22-22",
+      "timestamp": "2016-02-26T02:03:46.130975Z"
+    }
+  ]
+}
+```
+
+**Status Codes:**
+- `200` if successful
+- `403` if user is not authenticated
+
+
+#### Get a passenger
+
+**GET:** `/api/v1/passenger/:id`
+
+**Response:**
+```json
+{
+    "id": 7,
+    "user": 1,
+    "trip": 1,
+    "first_name": "Tom",
+    "middle_name": "Edward Patrick",
+    "last_name": "Brady",
+    "phone": "1234567890",
+    "gender": "M",
+    "birthdate": "1111-11-11",
+    "timestamp": "2016-02-26T16:56:03.989179Z"
+}
+```
+
+**Status Codes:**
+- `200` if successful
+- `403` if user is not authenticated or owner
+- `404` if passenger is not found
+
+
+#### Update a passenger
+
+**PATCH:** `/api/v1/passenger/:id`
+
+**Body:**
+```json
+{
+    "middle_name": "Edward Patrick",
+    "phone": "1234567890",
+    "gender": "M",
+    "birthdate": "1111-11-11"
+}
+```
+
+**Response:**
+```json
+{
+    "id": 7,
+    "user": 1,
+    "trip": 1,
+    "first_name": "Tom",
+    "middle_name": "Edward Patrick",
+    "last_name": "Brady",
+    "phone": "1234567890",
+    "gender": "M",
+    "birthdate": "1111-11-11",
+    "timestamp": "2016-02-26T16:56:03.989179Z"
+}
+```
+
+**Status Codes:**
+- `200` if successful
+- `400` if `trip`, `phone` and `birthdate` are not unique together
+- `403` if user is not authorized or owner
+- `404` if passenger is not found
 
 
 ### Trips

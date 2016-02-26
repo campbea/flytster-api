@@ -40,6 +40,7 @@ class FlytsterUser(AbstractBaseUser):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     is_verified = models.BooleanField(default=False)
+    recieve_notifications = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     objects = FlytsterUserManager()
