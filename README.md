@@ -36,16 +36,11 @@ There are a few configurations managed as environment variables. In the developm
 - [List all passengers](#list-all-passengers)
 - [Get a passenger](#get-a-passenger)
 - [Update a passenger](#update-a-passenger)
-- [Delete a passenger](#delete-a-passenger)
 
 #### Trips
-- [Create a trip search](#create-a-trip-search)
-- [List all trip searches](#list-all-trip-searches)
-- [Get a trip search](#get-a-trip-search)
-- [Delete a trip search](#delete-a-trip-search)
-
-#### Trip & Status
-- [Get status of a trip](#get-status-of-a-trip)
+- [Create a trip](#create-a-trip)
+- [List all trips](#list-all-trips)
+- [Get a trip](#get-a-trip)
 
 
 ## API Routes
@@ -459,14 +454,24 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
 
 ### Trips
 
+A trip is makes up all of the user's flights purchased at once. A trip can be one-way, round-trip, or multi-city. Each trip instance has a status dict field. This field represents the current status of the trip as it goes through the booking & ticketing process. Trips are booked with Sabre and will be ticketed through a local host agency.
+
+**STATUSES:**
+- `is_selected`: Defaults to true when a trip is initially created,
+- `is_confirmed`: Becomes true after passenger information is completed,
+- `is_sabre_successful`: Becomes true after Sabre booking is successful,
+- `is_purchased`: Becomes true after passenger successfully purchase ticket,
+- `is_ticketed`: Becomes true once ticketing is successful
+- `is_expired`: Becomes true once the current date equals the departure date,
+
 
 #### Create a trip
 
 **POST:** `/api/v1/trip/`
 
 **Notes:**
-- This route will be used every time a user selects a trip after a search and is on the trip's detail page. The next step would be for the user to select checkout, or some other button to move on to purchasing. This info will be saved in order to speed up the checkout process and allow the user to reference their past searches.
-- `trip_option` is the tripOption a user selected. The trip body example is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`. IMPORTANT: `trip_option` must be a Google QPX tripOption and have `kind`, `id`, `slice` and `purchase` field. The value of `kind` must be `qpxexpress#tripOption`.
+- This route will be used every time a user selects a trip (The next step for the user would be inputing passenger information).
+- `trip_option` is the Google QPX tripOption a user selected. The following trip example below is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`. IMPORTANT: `trip_option` must be a Google QPX tripOption and have `kind`, `id`, `slice` and `purchase` field. The value of `kind` must be `qpxexpress#tripOption`.
 
 **Body:**
 ```json
@@ -642,6 +647,7 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
       "is_confirmed": false,
       "is_sabre_successful": false,
       "is_purchased": false,
+      "is_ticketed": false,
       "is_expired": false,
       "updated": "2016-02-21T04:59:22.173893Z"
     },
@@ -679,6 +685,7 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
         "is_confirmed": false,
         "is_sabre_successful": false,
         "is_purchased": false,
+        "is_ticketed": false,
         "is_expired": false,
         "updated": "2016-02-21T04:59:22.173893Z"
       },
@@ -694,6 +701,7 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
         "is_confirmed": false,
         "is_sabre_successful": false,
         "is_purchased": false,
+        "is_ticketed": false,
         "is_expired": false,
         "updated": "2016-02-21T04:59:22.173893Z"
       },
@@ -709,7 +717,7 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
 - `403` if user is not authenticated
 
 
-#### Retrieve a trip
+#### Get a trip
 
 **GET:** `/api/v1/trip/:id`
 
@@ -724,6 +732,7 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
       "is_confirmed": false,
       "is_sabre_successful": false,
       "is_purchased": false,
+      "is_ticketed": false,
       "is_expired": false,
       "updated": "2016-02-21T04:59:22.173893Z"
     },
