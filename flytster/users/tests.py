@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from users.models import FlytsterUser
-from authentication.models import AuthToken, EmailToken, PasswordToken
+from authentication.models import AuthToken, EmailToken, PasswordToken, PhoneToken
 
 
 class TestUserMixin(object):
@@ -307,7 +307,164 @@ class GetUpdateUserTest(TestUserMixin, APITestCase):
         self.assertEqual(response.data['id'], self.user.id)
         self.assertEqual(response.data['email'], data['email'])
         self.assertFalse(response.data['email_pending'])
-        self.assertTrue(response.data['is_verified'])
+        self.assertTrue(response.data['email_verified'])
+
+    def test_update_user_phone(self):
+        new_phone = '3174554303'
+        url = reverse('get_update_user')
+        data = {'phone': new_phone}
+
+        response = self.client.patch(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertEqual(response.data['id'], self.user.id)
+        self.assertEqual(response.data['phone_pending'], new_phone)
+        self.assertEqual(response.data['phone'], None)
+
+    def test_update_user_phone_then_verify(self):
+        new_phone = '3174554303'
+        url = reverse('get_update_user')
+        data = {'phone': new_phone}
+
+        response = self.client.patch(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertEqual(response.data['id'], self.user.id)
+        self.assertEqual(response.data['phone_pending'], new_phone)
+        self.assertEqual(response.data['phone'], None)
+
+        token = PhoneToken.objects.get(user=self.user).token
+        url = reverse('verify_phone')
+        data = {'token': token}
+
+        response = self.client.post(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertTrue(response.data['phone_verified'])
+        self.assertEqual(response.data['phone'], new_phone)
+
+        url = reverse('get_update_user')
+        data = {'phone': None}
+
+        response = self.client.patch(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertEqual(response.data['id'], self.user.id)
+        self.assertEqual(response.data['phone_pending'], None)
+        self.assertEqual(response.data['phone'], None)
+
+    def test_update_user_phone_new_phone(self):
+        self.user.phone = '3174554303'
+        self.user.phone_verified = True
+        self.user.save()
+
+        user_id = self.user.id
+        new_phone = '3174554304'
+
+        url = reverse('get_update_user')
+        data = {'phone': new_phone}
+
+        response = self.client.patch(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertEqual(response.data['id'], user_id)
+        self.assertEqual(response.data['phone_pending'], new_phone)
+        self.assertEqual(response.data['phone'], self.user.phone)
+
+    def test_update_user_phone_new_phone_old_phone(self):
+        self.user.phone = '3174554303'
+        self.user.phone_verified = True
+        self.user.save()
+
+        user_id = self.user.id
+        new_phone = '3174554304'
+
+        url = reverse('get_update_user')
+        data = {'phone': new_phone}
+
+        response = self.client.patch(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertEqual(response.data['id'], user_id)
+        self.assertEqual(response.data['phone_pending'], new_phone)
+        self.assertEqual(response.data['phone'], self.user.phone)
+
+        data = {'phone': self.user.phone}
+
+        response = self.client.patch(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertEqual(response.data['id'], user_id)
+        self.assertEqual(response.data['phone_pending'], None)
+        self.assertEqual(response.data['phone'], self.user.phone)
+
+    def test_update_user_phone_token_changes(self):
+        self.user.phone = '3174554303'
+        self.user.phone_verified = True
+        self.user.save()
+
+        user_id = self.user.id
+        new_phone = '3174554304'
+
+        url = reverse('get_update_user')
+        data = {'phone': new_phone}
+
+        response = self.client.patch(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertEqual(response.data['id'], user_id)
+        self.assertEqual(response.data['phone_pending'], new_phone)
+        self.assertEqual(response.data['phone'], self.user.phone)
+
+        token = PhoneToken.objects.get(user=self.user).token
+
+        new_phone = '3174554305'
+        url = reverse('get_update_user')
+        data = {'phone': new_phone}
+
+        response = self.client.patch(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertEqual(response.data['id'], user_id)
+        self.assertEqual(response.data['phone_pending'], new_phone)
+        self.assertEqual(response.data['phone'], self.user.phone)
+
+        new_token = PhoneToken.objects.get(user=self.user).token
+
+        self.assertNotEqual(token, new_token)
+
+    def test_update_user_phone_bad_data(self):
+        new_phone = '10notvalid'
+
+        url = reverse('get_update_user')
+
+        data = {'phone': new_phone}
+
+        response = self.client.patch(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(response.data)
+        self.assertEqual(response.data['phone'][0], 'Phone numbers must be 10 digits.')
+
+    def test_update_user_phone_and_email(self):
+        self.user.phone = '3174554303'
+        self.user.phone_verified = True
+        self.user.save()
+
+        user_id = self.user.id
+        new_phone = '3174554304'
+        new_email = 'flyhigh2222@gmail.com'
+
+        url = reverse('get_update_user')
+        data = {'phone': new_phone, 'email': new_email}
+
+        response = self.client.patch(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertEqual(response.data['id'], user_id)
+        self.assertEqual(response.data['email_pending'], new_email)
+        self.assertEqual(response.data['email'], self.user.email)
+        self.assertEqual(response.data['phone_pending'], new_phone)
+        self.assertEqual(response.data['phone'], self.user.phone)
 
 
 class VerifyEmailTest(TestUserMixin, APITestCase):
@@ -321,7 +478,7 @@ class VerifyEmailTest(TestUserMixin, APITestCase):
         response = self.client.post(url, data=data, format='json', **self.auth)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['email'], 'flyhigh2@gmail.com')
-        self.assertTrue(response.data['is_verified'])
+        self.assertTrue(response.data['email_verified'])
         self.assertFalse(response.data['email_pending'])
 
 
@@ -372,6 +529,89 @@ class VerifyEmailTest(TestUserMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(response.data['detail'])
         self.assertIn('invalid', response.data['detail'].lower())
+
+
+class VerifyPhoneTest(TestUserMixin, APITestCase):
+
+    def test_verify_phone(self):
+        self.user.send_verification_sms('3174554303')
+        token = PhoneToken.objects.get(user=self.user).token
+
+        url = reverse('verify_phone')
+        data = {'token': token}
+
+        response = self.client.post(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data)
+        self.assertTrue(response.data['phone_verified'])
+        self.assertEqual(response.data['phone'], '3174554303')
+
+    def test_verify_phone_bad_token(self):
+        self.user.send_verification_sms('3174554303')
+        token = '$$$$$$$$$'
+
+        url = reverse('verify_phone')
+        data = {'token': token}
+
+        response = self.client.post(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_verify_phone_wrong_token(self):
+        self.user.send_verification_sms('3174554303')
+        token = PhoneToken.objects.get(user=self.user).token
+        bad_token = uuid4().hex[:6]
+        while token == bad_token:
+            bad_token = uuid4().hex[:6]
+
+        url = reverse('verify_phone')
+        data = {'token': bad_token}
+
+        response = self.client.post(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(response.data['detail'])
+        self.assertIn('invalid', response.data['detail'].lower())
+
+    def test_verify_phone_expired_token(self):
+        self.user.send_verification_sms('3174554303')
+        pt = PhoneToken.objects.get(user=self.user)
+        pt.timestamp = timezone.now() - timedelta(days=7)
+        pt.save()
+        token = pt.token
+
+        url = reverse('verify_phone')
+        data = {'token': token}
+
+        response = self.client.post(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(response.data['detail'])
+        self.assertIn('expired', response.data['detail'].lower())
+
+    def test_verify_phone_no_token(self):
+        url = reverse('verify_phone')
+        data = {'token': 'abc123'}
+
+        response = self.client.post(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(response.data['detail'])
+        self.assertIn('does not have', response.data['detail'].lower())
+
+    def test_verify_phone_existing_phone_exists(self):
+        self.user.send_verification_sms('3174554303')
+        token = PhoneToken.objects.get(user=self.user).token
+
+        new_user = FlytsterUser.objects.create_user(
+            first_name='Flytster',
+            last_name='LLC',
+            email='flytster@gmail.com',
+            password='supersecret1',
+            phone='3174554303'
+        )
+
+        url = reverse('verify_phone')
+        data = {'token': token}
+
+        response = self.client.post(url, data=data, format='json', **self.auth)
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
 
 class ChangePasswordTest(TestUserMixin, APITestCase):

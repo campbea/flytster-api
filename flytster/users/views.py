@@ -9,8 +9,9 @@ from authentication.models import AuthToken, InvalidTokenError, PasswordToken
 
 from .models import FlytsterUser
 from .serializers import (RegisterUserSerializer, LoginSerializer,
-    UserSerializer, UserWithTokenSerializer, VerifyTokenSerializer,
-    ChangePasswordSerializer, RequestPasswordResetSerializer, ResetPasswordSerializer)
+    UserSerializer, UserWithTokenSerializer, VerifyEmailTokenSerializer,
+    ChangePasswordSerializer, RequestPasswordResetSerializer, ResetPasswordSerializer,
+    VerifyPhoneTokenSerializer)
 
 
 class RegisterUser(views.APIView):
@@ -94,7 +95,7 @@ class VerifyUserEmail(views.APIView):
     """
 
     def post(self, request):
-        token = VerifyTokenSerializer(data=request.data)
+        token = VerifyEmailTokenSerializer(data=request.data)
         token.is_valid(raise_exception=True)
 
         try:
@@ -182,4 +183,26 @@ class ResetPassword(views.APIView):
         token.delete()
 
         result = UserWithTokenSerializer(user)
+        return Response(result.data, status=status.HTTP_200_OK)
+
+
+class VerifyPhone(views.APIView):
+    """
+    POST: If the provided token is valid, verifies a user's phone number.
+    """
+
+    def post(self, request):
+        verify = VerifyPhoneTokenSerializer(data=request.data)
+        verify.is_valid(raise_exception=True)
+
+        try:
+            request.user.verify_phone(verify.validated_data['token'])
+        except InvalidTokenError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except IntegrityError:
+            return Response(
+                {'detail': 'That phone number is already verified by another user.'},
+                status=status.HTTP_409_CONFLICT)
+
+        result = UserSerializer(request.user)
         return Response(result.data, status=status.HTTP_200_OK)
