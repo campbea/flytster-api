@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+    <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+        <SOAP-ENV:Header>
+            <eb:MessageHeader xmlns:eb="http://www.ebxml.org/namespaces/messageHeader" SOAP-ENV:mustUnderstand="0">
+                <eb:From>
+                    <eb:PartyId eb:type="urn:x12.org:IO5:01">from</eb:PartyId>
+                </eb:From>
+                <eb:To>
+                    <eb:PartyId eb:type="urn:x12.org:IO5:01">ws</eb:PartyId>
+                </eb:To>
+                <eb:CPAId>{{PPC}}</eb:CPAId>
+                <eb:ConversationId>{{EMAIL}}</eb:ConversationId>
+                <eb:Service eb:type="sabreXML"></eb:Service>
+                <eb:Action>OTA_AirBookLLSRQ</eb:Action>
+            </eb:MessageHeader> <ns6:Security xmlns:ns6="http://schemas.xmlsoap.org/ws/2002/12/secext" SOAP-ENV:mustUnderstand="0">
+                <ns6:BinarySecurityToken>{{TOKEN}}</ns6:BinarySecurityToken>
+            </ns6:Security>
+        </SOAP-ENV:Header>
+        <SOAP-ENV:Body>
+            <OTA_AirBookRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.1.0">
+                <OriginDestinationInformation>
+                  {% for flight in TRIP.flights.all() %}
+                    <FlightSegment DepartureDateTime="{{flight.departure_time[:16]}}" ArrivalDateTime="{{flight.arrival_time[:16]}}" FlightNumber="{{flight.number}}" NumberInParty="{{flight.passengers}}" ResBookDesigCode="{{flight.booking_code}}" Status="NN">
+                        <DestinationLocation LocationCode="{{flight.destination}}"/>
+                        <Equipment AirEquipType="{{flight.aircraft}}"/>
+                        <MarketingAirline Code="{{flight.carrier}}" FlightNumber="{{flight.number}}"/>
+                        <OperatingAirline Code="{{flight.carrier}}"/>
+                        <OriginLocation LocationCode="{{flight.origin}}"/>
+                    </FlightSegment>
+                    {% endfor %}
+                </OriginDestinationInformation>
+            </OTA_AirBookRQ>
+        </SOAP-ENV:Body>
+    </SOAP-ENV:Envelope>
