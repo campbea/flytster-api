@@ -157,6 +157,16 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', None)
 SERVER_KEY = os.getenv('SERVER_KEY', None)
 GOOGLE_TRIP_SEARCH_URL = 'https://www.googleapis.com/qpxExpress/v1/trips/search'
 
+# Twilio API
+if TESTING:
+    TWILIO_ACCOUNT_ID = os.getenv('TEST_TWILIO_ACCOUNT_ID')
+    TWILIO_API_TOKEN = os.getenv('TEST_TWILIO_API_TOKEN')
+    TWILIO_NUMBER = os.getenv('TEST_TWILIO_NUMBER')
+else:
+    TWILIO_ACCOUNT_ID = os.getenv('TWILIO_ACCOUNT_ID')
+    TWILIO_API_TOKEN = os.getenv('TWILIO_API_TOKEN')
+    TWILIO_NUMBER = os.getenv('TWILIO_NUMBER')
+
 # Stripe API
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', None)
 
