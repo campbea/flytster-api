@@ -12,3 +12,11 @@ class Credit(models.Model):
     used = models.BooleanField(default=False)
     expiration = models.DateTimeField(default=set_expiration)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = u'Credit'
+        verbose_name_plural = u'Credits'
+        ordering = ['-timestamp']
+
+    def str(self):
+        return self.amount
