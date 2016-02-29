@@ -30,7 +30,7 @@ class AuthToken(models.Model):
     def is_expired(self):
         delta = timedelta(
             days=settings.TOKEN_EXP_IN_DAYS
-            ) if self.user.is_verified else timedelta(hours=24)
+            ) if self.user.email_verified else timedelta(hours=24)
         if timezone.now() - self.timestamp < delta:
             return False
         self.delete()
@@ -69,8 +69,9 @@ class VerificationToken(models.Model):
     This is an abstract model used to verify email and password tokens.
     Each token will expire in 7 days if not used.
     """
+    TOKEN_LENGTH = 20
 
-    token = models.CharField(max_length=20, unique=True)
+    token = models.CharField(max_length=TOKEN_LENGTH, unique=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -87,7 +88,7 @@ class VerificationToken(models.Model):
         return True
 
     def generate_token(self):
-        return uuid4().hex[:20]
+        return uuid4().hex[:self.TOKEN_LENGTH]
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -106,6 +107,18 @@ class EmailToken(VerificationToken):
     class Meta:
         verbose_name = u'EmailToken'
         verbose_name_plural = u'EmailTokens'
+
+
+class PhoneToken(VerificationToken):
+
+    TOKEN_LENGTH = 6
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='phone_token')
+    phone = models.CharField(max_length=10)
+
+    class Meta:
+        verbose_name = u'PhoneToken'
+        verbose_name_plural = u'PhoneTokens'
 
 
 class PasswordToken(VerificationToken):
