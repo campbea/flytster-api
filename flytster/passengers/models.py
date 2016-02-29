@@ -17,7 +17,6 @@ class Passenger(models.Model):
     first_name = models.CharField(max_length=20, null=False)
     middle_name = models.CharField(max_length=20, null=True)
     last_name = models.CharField(max_length=20, null=False)
-    phone = models.CharField(max_length=10, null=False)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     birthdate = models.DateField(null=False)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -26,7 +25,7 @@ class Passenger(models.Model):
         verbose_name = u'Passenger'
         verbose_name_plural = u'Passengers'
         ordering = ['-timestamp']
-        unique_together = ('trip', 'phone', 'birthdate')
+        unique_together = ('trip', 'first_name', 'last_name', 'birthdate')
 
     def get_full_name(self):
         if self.middle_name:

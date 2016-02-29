@@ -15,7 +15,6 @@ PASSENGER_DATA_ONE = {
     "trip_id": "this will be replaced with actual trip pk",
     "first_name": "Drew",
     "last_name": "Brees",
-    "phone": "0987654321",
     "gender": "M",
     "birthdate": "1979-01-15"
 }
@@ -24,7 +23,6 @@ PASSENGER_DATA_TWO = {
     "trip_id": "this will be replaced with actual trip pk",
     "first_name": "Matt",
     "last_name": "Ryan",
-    "phone": "1234567890",
     "gender": "M",
     "birthdate": "1985-05-17"
 }
@@ -71,24 +69,6 @@ class CreatePassengerTest(PassengerTestMixin, APITestCase):
         self.assertEqual(response.data['trip'], self.trip.id)
         self.assertEqual(response.data['first_name'], data['first_name'])
         self.assertEqual(response.data['last_name'], data['last_name'])
-
-    def test_create_passenger_bad_phone_format(self):
-        data = deepcopy(PASSENGER_DATA_ONE)
-        data['trip_id'] = self.trip.id
-        data['phone'] = "111-111-1111"
-
-        response = self.client.post(self.url_list_create, data=data, format='json', **self.auth)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('phone', response.data)
-
-    def test_create_passenger_bad_phone_num(self):
-        data = deepcopy(PASSENGER_DATA_ONE)
-        data['trip_id'] = self.trip.id
-        data['phone'] = "11111"
-
-        response = self.client.post(self.url_list_create, data=data, format='json', **self.auth)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('phone', response.data)
 
     def test_create_passenger_bad_birthdate(self):
         data = deepcopy(PASSENGER_DATA_ONE)
@@ -263,19 +243,6 @@ class UpdatePassengerTest(PassengerTestMixin, APITestCase):
         self.assertEqual(response.data['first_name'], data['first_name'])
         self.assertEqual(response.data['last_name'], data['last_name'])
 
-    def test_update_passenger_bad_phone_format(self):
-        data = deepcopy(PASSENGER_DATA_ONE)
-        data['trip_id'] = self.trip.id
-        response = self.client.post(self.url_list_create, data=data, format='json', **self.auth)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        passenger_id = response.data['id']
-
-        data = {"phone": "111-111-1111"}
-        response = self.client.patch(self.url_get_update(passenger_id), data=data, format='json', **self.auth)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('phone', response.data)
-
     def test_update_passenger_bad_birthdate_format(self):
         data = deepcopy(PASSENGER_DATA_ONE)
         data['trip_id'] = self.trip.id
@@ -289,7 +256,7 @@ class UpdatePassengerTest(PassengerTestMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('birthdate', response.data)
 
-    def test_update_passenger_dup_phone_birthdate_trip(self):
+    def test_update_passenger_dup_ppassenger(self):
         data_one = deepcopy(PASSENGER_DATA_ONE)
         data_one['trip_id'] = self.trip.id
         response = self.client.post(self.url_list_create, data=data_one, format='json', **self.auth)
@@ -302,10 +269,13 @@ class UpdatePassengerTest(PassengerTestMixin, APITestCase):
 
         passenger_id = response.data['id']
 
-        data = {"phone": data_one['phone'], "birthdate": data_one['birthdate']}
+        data = {
+            "first_name": data_one['first_name'],
+            "last_name": data_one['last_name'],
+            "birthdate": data_one['birthdate']
+        }
         response = self.client.patch(self.url_get_update(passenger_id), data=data, format='json', **self.auth)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual('The fields trip, phone, birthdate must make a unique set.', response.data['detail'][0])
 
     def test_update_passenger_no_auth(self):
         data = deepcopy(PASSENGER_DATA_ONE)

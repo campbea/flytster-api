@@ -21,7 +21,7 @@ class ListCreatePassenger(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Passenger.objects.filter(user=self.request.user).order_by(
-            'phone', 'birthdate').distinct('phone', 'birthdate')
+            'first_name', 'last_name', 'birthdate').distinct('first_name', 'last_name', 'birthdate')
 
     def create(self, request, *args, **kwargs):
         passenger_data = self.get_serializer_class()(data=request.data)
@@ -31,8 +31,12 @@ class ListCreatePassenger(generics.ListCreateAPIView):
             passenger_data.validated_data['user'] = request.user
             passenger = Passenger.objects.create(**passenger_data.validated_data)
         except IntegrityError:
-            return Response({'detail': 'Passenger with this phone and birthdate already exists for this trip.'},
+            return Response({'detail': 'Passenger already exists.'},
                 status=status.HTTP_409_CONFLICT)
+
+        trip_status = passenger.trip.status
+        trip_status.is_passenger_ready = True
+        trip_status.save()
 
         result = PassengerSerializer(passenger)
         return Response(result.data, status=status.HTTP_201_CREATED)
