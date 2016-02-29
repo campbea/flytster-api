@@ -3,7 +3,7 @@
 
 ## Flytster
 
-Flytster is a web application where users purchase flights for the cheapest price. So how does Flyster work? First one finds and purchases a flight with a departure date less than 6 months away. Then if the price of the flight decreases before one's departure, the purchaser receives credit equal to the difference. The user can then apply that credit to their next flight purchase through Flytster.   
+Flytster is a web/iOS application where users purchase flights for the cheapest price. So how does Flyster work? First one finds and purchases a flight with a departure date less than 6 months away. Then if the price of the flight decreases before one's departure, the purchaser receives credit equal to the difference. The user can then apply that credit to their next flight purchase through Flytster.   
 
 To obtain airline information Flytster uses Google's [QPX Express API](https://developers.google.com/qpx-express/).
 
@@ -16,6 +16,9 @@ There are a few configurations managed as environment variables. In the developm
 * `DEBUG` - This toggles debug mode for the app to True/False.
 * `SECRET_KEY` - This is a secret string. It is used to encrypt and verify the authentication token on routes that require authentication. This is required. The app won't start without it.
 * `SERVER_KEY` - Google's API key to keep track of app credentials
+* `TWILIO_ACCOUNT_ID` - Twilio account id
+* `TWILIO_API_TOKEN` - Twilio authentication token
+* `TWILIO_NUMBER` - Flyter's twilio phone number in +1xxxxxxxxxx format
 
 
 ## API Table of Contents
@@ -27,6 +30,7 @@ There are a few configurations managed as environment variables. In the developm
 - [Get the users profile](#get-the-users-profile)
 - [Update the users profile](#update-the-users-profile)
 - [Verify a users email](#verify-a-users-email)
+- [Verify a users phone](#verify-a-users-phone)
 - [Change the users password](#change-the-users-password)
 - [Request a password reset](#request-a-password-reset)
 - [Reset a users password](#reset-a-users-password)
@@ -41,13 +45,14 @@ There are a few configurations managed as environment variables. In the developm
 - [Create a trip](#create-a-trip)
 - [List all trips](#list-all-trips)
 - [Get a trip](#get-a-trip)
+- [Check trip availability](#check-trip-availability)
 
 
 ## API Routes
 
 
 ### Users
-Flytster users only require an email to create an account. After creating an account, a user will have to verify their email address by clicking a link. Process for a verified user: Find a flight -> Add all of the passengers information -> Confirm booking -> Complete payment.
+Flytster users only require an email to create an account. After creating an account, a user will have to verify their email address by clicking a link. Further in the booking process the user will need to provide his/her phone number and then validate the number as well. Process for a verified user: Find a flight -> Add all of the passengers information -> Confirm booking -> Complete payment.
 
 #### Register a new user
 
@@ -72,13 +77,16 @@ Flytster users only require an email to create an account. After creating an acc
 **Response:**
 ```json
 {
-    "id": 5,
+    "id": 1,
     "first_name": "Cam",
     "last_name": "Newton",
     "email": "test@test.com",
-    "token": "6ba2103f4ac8a9712ffb2a689b0e",
-    "is_verified": false,
-    "timestamp": "2016-02-14T23:19:26.513620Z"
+    "phone": null,
+    "email_verified": false,
+    "phone_verified": false,
+    "recieve_notifications": true,
+    "token": "9ddef56c29bf466199289615fd43ad4e",
+    "timestamp": "2016-02-29T17:55:19.363236Z"
 }
 ```
 
@@ -103,13 +111,16 @@ Flytster users only require an email to create an account. After creating an acc
 **Response:**
 ```json
 {
-    "id": 5,
+    "id": 1,
     "first_name": "Cam",
     "last_name": "Newton",
     "email": "test@test.com",
-    "token": "6ba2103f4ac8a9712ffb2a689b0e",
-    "is_verified": false,
-    "timestamp": "2016-02-14T23:19:26.513620Z"
+    "phone": null,
+    "email_verified": false,
+    "phone_verified": false,
+    "recieve_notifications": true,
+    "token": "9ddef56c29bf466199289615fd43ad4e",
+    "timestamp": "2016-02-29T17:55:19.363236Z"
 }
 ```
 
@@ -139,13 +150,16 @@ Flytster users only require an email to create an account. After creating an acc
 **Response:**
 ```json
 {
-    "id": 5,
+    "id": 1,
     "first_name": "Cam",
     "last_name": "Newton",
     "email": "test@test.com",
-    "email_pending": null,
-    "is_verified": false,
-    "timestamp": "2016-02-14T23:19:26.513620Z"
+    "phone": null,
+    "email_verified": false,
+    "phone_verified": false,
+    "recieve_notifications": true,
+    "token": "9ddef56c29bf466199289615fd43ad4e",
+    "timestamp": "2016-02-29T17:55:19.363236Z"
 }
 ```
 
@@ -163,24 +177,30 @@ Flytster users only require an email to create an account. After creating an acc
 {
     "first_name": "Tom",
     "last_name": "Brady",
-    "email": "bradytime@gmail.com"
+    "email": "bradytime@gmail.com",
+    "phone": "3174554303"
 }
 ```
 
 **Notes:**
-- A user cannot update their profile until `is_verified` is true
-- If the user updates their email the user will receive an email containing a link to verify the new email (verification token is in link). Until the user verifies their token, the updated email will remain in email_pending.
+- `phone`: A ten-digit US phone number as string
+- When a user updates `email`, the user will receive a verification email. `email_verified` will remain false and `email` will remain their old email until the user verifies their email token.
+- When a user updates `phone`, the user will receive a verification text. `phone_verified` will remain false and `phone` will remain null until the user verifies their phone token.
 
 **Response:**
 ```json
 {
-    "id": 5,
+    "id": 1,
     "first_name": "Tom",
     "last_name": "Brady",
-    "email": "test@test.com",
-    "email_pending": "braddytime@gmail.com",
-    "is_verified": true,
-    "timestamp": "2016-02-14T23:19:26.513620Z"
+    "email": "flytster@gmail.com",
+    "phone": null,
+    "email_pending": "bradytime@gmail.com",
+    "email_verified": false,
+    "phone_pending": "3174554303",
+    "phone_verified": false,
+    "recieve_notifications": true,
+    "timestamp": "2016-02-29T17:55:19.363236Z"
 }
 ```
 
@@ -192,7 +212,7 @@ Flytster users only require an email to create an account. After creating an acc
 
 #### Verify a users email
 
-**POST:** `/v1/user/verify_email/`
+**POST:** `/v1/user/verify-email/`
 
 **Body:**
 ```json
@@ -207,19 +227,62 @@ Flytster users only require an email to create an account. After creating an acc
 **Response:**
 ```json
 {
-    "id": 5,
+    "id": 1,
     "first_name": "Tom",
     "last_name": "Brady",
-    "email": "test@test.com",
+    "email": "bradytime@gmail.com",
+    "phone": null,
     "email_pending": null,
-    "is_verified": true,
-    "timestamp": "2016-02-14T23:19:26.513620Z"
+    "email_verified": true,
+    "phone_pending": "3174554303",
+    "phone_verified": false,
+    "recieve_notifications": true,
+    "timestamp": "2016-02-29T17:55:19.363236Z"
 }
 ```
 
 **Status Codes:**
 - `200` if successful
 - `400` is bad data is sent
+- `403` if user is not authenticated
+- `404` if the code is invalid or expired
+
+
+#### Verify a users phone
+
+**POST:** `/v1/user/verify-phone/`
+
+**Body:**
+```json
+{
+    "code": "abc123",
+}
+```
+
+**Notes:**
+- `code`: Phone verification codes are 6 character combinations of lowercase letters and digits
+
+**Response:**
+```json
+{
+    "id": 1,
+    "first_name": "Tom",
+    "last_name": "Brady",
+    "email": "bradytime@gmail.com",
+    "phone": "3174554303",
+    "email_pending": null,
+    "email_verified": true,
+    "phone_pending": null,
+    "phone_verified": true,
+    "recieve_notifications": true,
+    "timestamp": "2016-02-29T17:55:19.363236Z"
+}
+```
+
+**Status Codes:**
+- `200` if successful
+- `400` is bad data is sent
+- `403` if user is not authenticated
 - `404` if the code is invalid or expired
 
 
@@ -244,6 +307,7 @@ Flytster users only require an email to create an account. After creating an acc
 **Status Codes:**
 - `200` if successful
 - `400` if invalid data is provided, or `old_password` doesn't match
+- `403` if user is not authenticated
 
 
 #### Request a password reset
@@ -293,7 +357,7 @@ Flytster users only require an email to create an account. After creating an acc
 
 
 ### Passengers
-Passengers are all of the individuals who will be flying on the purchased trip. Their full name must be exactly how it is on their government id. Their phone is required just in case we need to contact them. For each trip, a passengers phone and birthdate must be unique together to ensure that the same passenger was not added multiple times.
+Passengers are all of the individuals who will be flying on the purchased trip. Their full name must be exactly how it is on their government id. For each trip, a passengers full name and birthdate must be unique together to ensure that the same passenger was not added multiple times.
 
 
 #### Create a passenger
@@ -304,10 +368,8 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
 ```json
 {
     "trip_id": 1,
-    "first_name": "Tom",
-    "middle_name": "Edward Patrick",
-    "last_name": "Brady",
-    "phone": "1234567890",
+    "first_name": "Rob",
+    "last_name": "Gronk",
     "gender": "M",
     "birthdate": "1111-11-11"
 }
@@ -315,30 +377,29 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
 
 **Notes:**
 - `middle_name`: Not required
-- `phone`: A ten-digit US phone number as string
 - `gender`: Choices are `M` or `F`
 - `birthdate`: ISO format date string `YYYY-MM-DD`
-- `trip_id`, `phone` and `birthdate` must be unique together. This is to prevent a user inputing the same passenger twice. However, a user can input a contact phone number multiple times for different passengers.
+- `trip_id`, `first_name`, `last_name` and `birthdate` must be unique together. This is to prevent a user inputing the same passenger twice.
 
 **Response:**
 ```json
 {
-    "id": 7,
+    "id": 1,
     "user": 1,
     "trip": 1,
-    "first_name": "Tom",
-    "middle_name": "Edward Patrick",
-    "last_name": "Brady",
-    "phone": "1234567890",
+    "first_name": "Rob",
+    "middle_name": "",
+    "last_name": "Gronk",
     "gender": "M",
     "birthdate": "1111-11-11",
-    "timestamp": "2016-02-26T16:56:03.989179Z"
+    "timestamp": "2016-02-29T18:25:31.177351Z"
 }
 ```
 
 **Status Codes:**
 - `201` if successfully created
 - `400` if incorrect data is provided
+- `403` if user is not authenticated
 - `409` if passenger with `phone` and `birthdate` exists for this trip
 
 
@@ -347,7 +408,7 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
 **GET:** `/api/v1/passenger/`
 
 **NOTES:**
-- This will return a list of all unique passengers based on their `phone` and `birthdate`
+- This will return a list of all unique passengers
 
 **Response:**
 ```json
@@ -357,28 +418,26 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
   "previous": null,
   "results": [
     {
-      "id": 1,
-      "user": 1,
-      "trip": 1,
-      "first_name": "Peyton",
-      "middle_name": "",
-      "last_name": "Manning",
-      "phone": "1234567890",
-      "gender": "M",
-      "birthdate": "1111-11-11",
-      "timestamp": "2016-02-26T16:56:03.989179Z"
-    },
-    {
       "id": 2,
       "user": 1,
       "trip": 1,
-      "first_name": "Eli",
+      "first_name": "Julian",
       "middle_name": "",
-      "last_name": "Manning",
-      "phone": "1234567890",
+      "last_name": "Edelman",
       "gender": "M",
-      "birthdate": "2222-22-22",
-      "timestamp": "2016-02-26T02:03:46.130975Z"
+      "birthdate": "1111-11-11",
+      "timestamp": "2016-02-29T18:26:52.413471Z"
+    },
+    {
+      "id": 1,
+      "user": 1,
+      "trip": 1,
+      "first_name": "Rob",
+      "middle_name": "",
+      "last_name": "Gronk",
+      "gender": "M",
+      "birthdate": "1111-11-11",
+      "timestamp": "2016-02-29T18:25:31.177351Z"
     }
   ]
 }
@@ -396,16 +455,15 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
 **Response:**
 ```json
 {
-    "id": 7,
+    "id": 1,
     "user": 1,
     "trip": 1,
-    "first_name": "Tom",
-    "middle_name": "Edward Patrick",
-    "last_name": "Brady",
-    "phone": "1234567890",
+    "first_name": "Rob",
+    "middle_name": "",
+    "last_name": "Gronk",
     "gender": "M",
     "birthdate": "1111-11-11",
-    "timestamp": "2016-02-26T16:56:03.989179Z"
+    "timestamp": "2016-02-29T18:25:31.177351Z"
 }
 ```
 
@@ -422,26 +480,22 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
 **Body:**
 ```json
 {
-    "middle_name": "Edward Patrick",
-    "phone": "1234567890",
-    "gender": "M",
-    "birthdate": "1111-11-11"
+    "middle_name": "Monster"
 }
 ```
 
 **Response:**
 ```json
 {
-    "id": 7,
+    "id": 1,
     "user": 1,
     "trip": 1,
-    "first_name": "Tom",
-    "middle_name": "Edward Patrick",
-    "last_name": "Brady",
-    "phone": "1234567890",
+    "first_name": "Rob",
+    "middle_name": "Monster",
+    "last_name": "Gronk",
     "gender": "M",
     "birthdate": "1111-11-11",
-    "timestamp": "2016-02-26T16:56:03.989179Z"
+    "timestamp": "2016-02-29T18:25:31.177351Z"
 }
 ```
 
@@ -454,15 +508,16 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
 
 ### Trips
 
-A trip is makes up all of the user's flights purchased at once. A trip can be one-way, round-trip, or multi-city. Each trip instance has a status dict field. This field represents the current status of the trip as it goes through the booking & ticketing process. Trips are booked with Sabre and will be ticketed through a local host agency.
+A trip is made up of all of the user's flights purchased at once. A trip can be one-way or round-trip and a trip must be domestic. Each trip instance has a status dict field. This field represents the current status of the trip as it goes through the booking, purchasing, ticketing process. Trips are booked with Sabre and will be ticketed through a local host agency.
 
 **STATUSES:**
-- `is_selected`: Defaults to true when a trip is initially created,
-- `is_confirmed`: Becomes true after passenger information is completed,
-- `is_sabre_successful`: Becomes true after Sabre booking is successful,
-- `is_purchased`: Becomes true after passenger successfully purchase ticket,
-- `is_ticketed`: Becomes true once ticketing is successful
-- `is_expired`: Becomes true once the current date equals the departure date,
+- `is_selected`: Defaults to true when a trip is initially created.
+- `is_passenger_ready`: Becomes true after passenger information is completed.
+- `is_available`: Becomes true after checking price and availability on Sabre.
+- `is_purchased`: Becomes true after passenger successfully purchase ticket.
+- `is_booked`: Becomes true after trip is successfully booked through Sabre.
+- `is_ticketed`: Becomes true once ticketing is successful.
+- `is_expired`: Becomes true once the current date equals the departure date.
 
 
 #### Create a trip
@@ -470,8 +525,7 @@ A trip is makes up all of the user's flights purchased at once. A trip can be on
 **POST:** `/api/v1/trip/`
 
 **Notes:**
-- This route will be used every time a user selects a trip (The next step for the user would be inputing passenger information).
-- `trip_option` is the Google QPX tripOption a user selected. The following trip example below is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`. IMPORTANT: `trip_option` must be a Google QPX tripOption and have `kind`, `id`, `slice` and `purchase` field. The value of `kind` must be `qpxexpress#tripOption`.
+- `trip_option` is the Google QPX tripOption. The following trip example below is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`. IMPORTANT: `trip_option` must be a Google QPX tripOption and have `kind`, `id`, `slice` and `purchase` field. The value of `kind` must be `qpxexpress#tripOption`.
 
 **Body:**
 ```json
@@ -641,12 +695,13 @@ A trip is makes up all of the user's flights purchased at once. A trip can be on
 {
     "id": 1,
     "user": 1,
-    "cheapest_price": 50.5,
+    "cheapest_price": 286.20,
     "status": {
       "is_selected": true,
-      "is_confirmed": false,
-      "is_sabre_successful": false,
+      "is_passenger_ready": false,
+      "is_available": false,
       "is_purchased": false,
+      "is_booked": false,
       "is_ticketed": false,
       "is_expired": false,
       "updated": "2016-02-21T04:59:22.173893Z"
@@ -682,9 +737,10 @@ A trip is makes up all of the user's flights purchased at once. A trip can be on
       "cheapest_price": 50.5,
       "status": {
         "is_selected": true,
-        "is_confirmed": false,
-        "is_sabre_successful": false,
+        "is_passenger_ready": false,
+        "is_available": false,
         "is_purchased": false,
+        "is_booked": false,
         "is_ticketed": false,
         "is_expired": false,
         "updated": "2016-02-21T04:59:22.173893Z"
@@ -698,9 +754,10 @@ A trip is makes up all of the user's flights purchased at once. A trip can be on
       "cheapest_price": 50.5,
       "status": {
         "is_selected": true,
-        "is_confirmed": false,
-        "is_sabre_successful": false,
+        "is_passenger_ready": false,
+        "is_available": false,
         "is_purchased": false,
+        "is_booked": false,
         "is_ticketed": false,
         "is_expired": false,
         "updated": "2016-02-21T04:59:22.173893Z"
@@ -729,9 +786,10 @@ A trip is makes up all of the user's flights purchased at once. A trip can be on
     "cheapest_price": 50.5,
     "status": {
       "is_selected": true,
-      "is_confirmed": false,
-      "is_sabre_successful": false,
+      "is_passenger_ready": false,
+      "is_available": false,
       "is_purchased": false,
+      "is_booked": false,
       "is_ticketed": false,
       "is_expired": false,
       "updated": "2016-02-21T04:59:22.173893Z"
@@ -747,31 +805,9 @@ A trip is makes up all of the user's flights purchased at once. A trip can be on
 - `404` if trip search does not exist
 
 
-#### Create a trip purchase (not started)
+#### Check trip availability
 
-**POST:** `/api/v1/trip/purchase`
+**GET:** `/api/v1/trip/availability/:id`
 
 **Notes:**
-- This route will start the flight booking process: approve user's payment, create a trip, book flight through Sabre and then charge the user. The response will display the current status of the process. The process will complete once a trip_id is returned.
-
-
-#### Get status of a trip (not started)
-
-**GET:** `/api/v1/trip/status`
-
-**Response:**
-```json
-{
-    "id": 1,
-    "cc_approved": true,
-    "trip_created": true,
-    "sabre_successful": true,
-    "cc_charged": true,
-    "trip_id": 1,
-    "updated": "2016-02-14T23:19:26.513620Z"
-}
-```
-
-**Status Codes:**
-- `200` if successful
-- `403` if no/incorrect token
+- This route will check the flight availability through Sabre before the user enters their purchase info.
