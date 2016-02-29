@@ -7,15 +7,18 @@ from rest_framework import generics, status, views
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
+from sabre.soap_requests import (start_sabre_session, close_sabre_session,
+    check_air_availability, book_air_segment)
+
 from .models import Trip, TripStatus
-from .permissions import IsOwner
+from .permissions import IsOwnerOrAdmin
 from .serializers import TripPostSerializer, TripSerializer
-from .utils import create_flights_from_trip_option_data, InvalidTripOption
+from .utils import create_flights_from_trip_data, InvalidTripOption
 
 
 class TripListCreateView(generics.ListCreateAPIView):
     """
-    POST: Create a Trip instance from a user's selected flight.
+    POST: Create a Trip instance from a Google QPX tripOption.
     GET:  Get all Trip instances that are selected and not expired
     """
 
@@ -32,9 +35,7 @@ class TripListCreateView(generics.ListCreateAPIView):
 
     def post(self, request):
         new_trip = self.get_serializer_class()(data=request.data)
-
-        if not new_trip.is_valid():
-            return Response(new_trip.errors, status=status.HTTP_400_BAD_REQUEST)
+        new_trip.is_valid(raise_exception=True)
 
         trip = Trip.objects.create(
             user = request.user,
@@ -42,8 +43,7 @@ class TripListCreateView(generics.ListCreateAPIView):
             data = new_trip.validated_data['trip_option'])
 
         try:
-             # This takes care of validation and if there is an error the trip is deleted
-            create_flights_from_trip_option_data(trip)
+            create_flights_from_trip_data(trip)
         except InvalidTripOption as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -58,5 +58,23 @@ class TripRetrieveView(generics.RetrieveAPIView):
 
     model = Trip
     serializer_class = TripSerializer
-    permission_classes = (IsOwner,)
+    permission_classes = (IsOwnerOrAdmin,)
     queryset = Trip.objects.all()
+
+
+class CheckAvailabilityView(generics.RetrieveAPIView):
+    """
+    POST: Book trip with Sabre
+    """
+    model = Trip
+    serializer_class = TripSerializer
+    permission_classes = (IsOwnerOrAdmin,)
+
+    def get(self, request, *args, **kwargs):
+        trip = self.model.objects.get(pk=kwargs['pk'])
+
+        start_sabre_session()
+        check_air_availability('token', trip)
+
+        result = TripSerializer(trip)
+        return Response(result.data, status=status.HTTP_200_OK)

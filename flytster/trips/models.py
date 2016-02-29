@@ -13,23 +13,27 @@ CABIN_CHOICES = (
 
 
 class TripStatus(models.Model):
-    is_selected = models.BooleanField(default=True)    # So user can view trips
-    is_confirmed = models.BooleanField(default=False)  # User confirmed purchase
-    is_sabre_successful = models.BooleanField(default=False)  # Sabre response was successful
-    is_purchased = models.BooleanField(default=False)  # Trip was successfully purchased
-    is_expired = models.BooleanField(default=False)    # Trip is not in future
+    is_selected = models.BooleanField(default=True)
+    is_passenger_ready = models.BooleanField(default=False)
+    is_available = models.BooleanField(default=False)
+    is_purchased = models.BooleanField(default=False)
+    is_booked = models.BooleanField(default=False)
+    is_ticketed = models.BooleanField(default=False)
+    is_expired = models.BooleanField(default=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
 
 class TripPrice(models.Model):
     trip = models.ForeignKey("Trip", related_name='prices')
-    price = models.DecimalField(max_digits=8, decimal_places=2)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    tax = models.DecimalField(max_digits=6, decimal_places=2)
+    total = models.DecimalField(max_digits=6, decimal_places=2)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = "TripPrice"
         verbose_name_plural = "TripPrices"
-        ordering = ['price']
+        ordering = ['-timestamp']
 
     def __unicode__(self):
         return '{0}'.format(self.price)

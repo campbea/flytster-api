@@ -1,6 +1,8 @@
 import re
 import time
 
+from django.db.models import Min
+
 from rest_framework import serializers
 
 from .models import Trip, TripStatus
@@ -10,8 +12,8 @@ class TripStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TripStatus
-        fields = ('is_selected', 'is_confirmed', 'is_sabre_successful',
-            'is_purchased', 'is_expired', 'updated')
+        fields = ('is_selected', 'is_passenger_ready', 'is_available',
+            'is_purchased', 'is_booked', 'is_expired', 'updated')
 
 
 class TripPostSerializer(serializers.Serializer):
@@ -39,4 +41,5 @@ class TripSerializer(serializers.ModelSerializer):
 
     def get_cheapest_price(self, obj):
         if obj.prices.first():
-            return obj.prices.first().price
+            d = obj.prices.aggregate(cheapest_price=Min('total'))
+            return d['cheapest_price']
