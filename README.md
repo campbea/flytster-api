@@ -517,7 +517,6 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
 - `is_purchased`: Becomes true after passenger successfully purchase ticket.
 - `is_booked`: Becomes true after trip is successfully booked through Sabre.
 - `is_ticketed`: Becomes true once ticketing is successful.
-- `is_expired`: Becomes true once the current date equals the departure date.
 
 
 #### Create a trip
@@ -525,153 +524,75 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
 **POST:** `/api/v1/trip/`
 
 **Notes:**
+- `departure_date` is the date of trip departure in the format `YYYY-MM-DD`.
 - `trip_option` is the Google QPX tripOption. The following trip example below is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`. IMPORTANT: `trip_option` must be a Google QPX tripOption and have `kind`, `id`, `slice` and `purchase` field. The value of `kind` must be `qpxexpress#tripOption`.
 
 **Body:**
 ```json
 {
-  "trip_option": {
-    "kind": "qpxexpress#tripOption",
-    "saleTotal": "USD286.20",
-    "id": "dfeVRNNDeQKQ1wRSjTu31G001",
-    "slice": [
-      {
-        "kind": "qpxexpress#sliceInfo",
-        "duration": 159,
-        "segment": [
-          {
-            "kind": "qpxexpress#segmentInfo",
-            "duration": 159,
-            "flight": {
+    "departure_date": "2016-02-16",
+    "trip_data": {
+      "slice": [
+        {
+          "duration": 159,
+          "segment": [
+            {
+              "id": "GRVECUxTw70vJ0tX",
+              "duration": 159,
               "carrier": "NK",
-              "number": "847"
-            },
-            "id": "GRVECUxTw70vJ0tX",
-            "cabin": "COACH",
-            "bookingCode": "Y",
-            "bookingCodeCount": 4,
-            "marriedSegmentGroup": "0",
-            "leg": [
-              {
-                "kind": "qpxexpress#legInfo",
-                "id": "LJXwJbKqnxTa3M7W",
-                "aircraft": "320",
-                "arrivalTime": "2016-02-16T14:04-07:00",
-                "departureTime": "2016-02-16T12:25-06:00",
-                "origin": "ORD",
-                "destination": "DEN",
-                "originTerminal": "3",
-                "duration": 159,
-                "onTimePerformance": 80,
-                "mileage": 885,
-                "secure": true
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "kind": "qpxexpress#sliceInfo",
-        "duration": 151,
-        "segment": [
-          {
-            "kind": "qpxexpress#segmentInfo",
-            "duration": 151,
-            "flight": {
-              "carrier": "NK",
-              "number": "630"
-            },
-            "id": "G+kXUtDqIMFX4Z5l",
-            "cabin": "COACH",
-            "bookingCode": "R",
-            "bookingCodeCount": 4,
-            "marriedSegmentGroup": "1",
-            "leg": [
-              {
-                "kind": "qpxexpress#legInfo",
-                "id": "Lv8L4zSGi8WBXhSj",
-                "aircraft": "320",
-                "arrivalTime": "2016-02-17T17:06-06:00",
-                "departureTime": "2016-02-17T13:35-07:00",
-                "origin": "DEN",
-                "destination": "ORD",
-                "destinationTerminal": "3",
-                "duration": 151,
-                "onTimePerformance": 70,
-                "mileage": 885,
-                "secure": true
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    "pricing": [
-      {
-        "saleTotal": "USD286.20",
-        "fareCalculation": "CHI NK DEN Q18.60 Q4.65 147.91YNR NK CHI Q18.60 Q4.65 45.58RNR USD 239.99 END ZP ORD DEN XT 18.01US 8.00ZP 11.20AY 9.00XF ORD4.50 DEN4.50",
-        "baseFareTotal": "USD239.99",
-        "kind": "qpxexpress#pricingInfo",
-        "saleTaxTotal": "USD46.21",
-        "latestTicketingTime": "2016-02-16T10:25-05:00",
-        "saleFareTotal": "USD239.99",
-        "ptc": "ADT",
-        "fare": [
-          {
-            "carrier": "NK",
-            "kind": "qpxexpress#fareInfo",
-            "origin": "CHI",
-            "basisCode": "YNR",
-            "destination": "DEN",
-            "id": "A+2CScErZefeLB8STqkhnLUDbuPHvoW8d2mSGczs"
-          },
-          {
-            "carrier": "NK",
-            "kind": "qpxexpress#fareInfo",
-            "origin": "DEN",
-            "basisCode": "RNR",
-            "destination": "CHI",
-            "id": "Aplj9coCfvfdtoY9NJA4IgAAPsOi/5tOnLwy7xDA"
-          }
-        ],
-        "passengers": {
-          "kind": "qpxexpress#passengerCounts",
-          "adultCount": 1
+              "number": "847",
+              "cabin": "COACH",
+              "booking_code": "Y",
+              "booking_count": 1,
+              "married": "0",
+              "leg": [
+                {
+                  "id": "LcFy6BgTQAq1iHjZ",
+                  "duration": 159,
+                  "aircraft": "320",
+                  "arrival_time": "2016-02-16T14:04-07:00",
+                  "departure_time": "2016-02-16T12:25-06:00",
+                  "origin": "ORD",
+                  "destination": "DEN"
+                }  
+              ]
+            }
+          ]
         },
-        "tax": [
-          {
-            "code": "US",
-            "chargeType": "GOVERNMENT",
-            "kind": "qpxexpress#taxInfo",
-            "country": "US",
-            "id": "US_001",
-            "salePrice": "USD18.01"
-          },
-          {
-            "code": "AY",
-            "chargeType": "GOVERNMENT",
-            "kind": "qpxexpress#taxInfo",
-            "country": "US",
-            "id": "AY_001",
-            "salePrice": "USD11.20"
-          },
-          {
-            "code": "XF",
-            "chargeType": "GOVERNMENT",
-            "kind": "qpxexpress#taxInfo",
-            "country": "US",
-            "id": "XF",
-            "salePrice": "USD9.00"
-          },
-          {
-            "code": "ZP",
-            "chargeType": "GOVERNMENT",
-            "kind": "qpxexpress#taxInfo",
-            "country": "US",
-            "id": "ZP",
-            "salePrice": "USD8.00"
-          }
-        ],
+        {
+          "duration": 151,
+          "segment": [
+            {
+              "id": "G+kXUtDqIMFX4Z5l",
+              "duration": 151,
+              "carrier": "NK",
+              "number": "630",
+              "cabin": "COACH",
+              "booking_code": "Y",
+              "booking_count": 1,
+              "married": "1",
+              "leg": [
+                {
+                  "id": "LGe417zWHUYN3Oma",
+                  "duration": 151,
+                  "aircraft": "320",
+                  "arrival_time": "2016-02-17T17:06-06:00",
+                  "departure_time": "2016-02-17T13:35-07:00",
+                  "origin": "DEN",
+                  "destination": "ORD"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "pricing_data": {
+        "fare_total": "USD885.58",
+        "tax_total": "USD111.62",
+        "sale_total": "USD997.20",
+        "latestTicketingTime": "2016-02-16T10:25-05:00",
+        "ptc": "ADT",
         "segmentPricing": [
           {
             "segmentId": "GRVECUxTw70vJ0tX",
@@ -683,10 +604,38 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
             "kind": "qpxexpress#segmentPricing",
             "fareId": "Aplj9coCfvfdtoY9NJA4IgAAPsOi/5tOnLwy7xDA"
           }
-        ]
-      }
-    ]
-  }  
+        ],
+        "tax": [
+          {
+            "code": "US",
+            "chargeType": "GOVERNMENT",
+            "country": "US",
+            "id": "US_001",
+            "salePrice": "USD18.01"
+          },
+          {
+            "code": "AY",
+            "chargeType": "GOVERNMENT",
+            "country": "US",
+            "id": "AY_001",
+            "salePrice": "USD11.20"
+          },
+          {
+            "code": "XF",
+            "chargeType": "GOVERNMENT",
+            "country": "US",
+            "id": "XF",
+            "salePrice": "USD9.00"
+          },
+          {
+            "code": "ZP",
+            "chargeType": "GOVERNMENT",
+            "country": "US",
+            "id": "ZP",
+            "salePrice": "USD8.00"
+          }
+        ]    
+    }
 }
 ```
 
@@ -703,7 +652,6 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
       "is_purchased": false,
       "is_booked": false,
       "is_ticketed": false,
-      "is_expired": false,
       "updated": "2016-02-21T04:59:22.173893Z"
     },
     "data": {"..."},
@@ -742,7 +690,6 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
         "is_purchased": false,
         "is_booked": false,
         "is_ticketed": false,
-        "is_expired": false,
         "updated": "2016-02-21T04:59:22.173893Z"
       },
       "data": {"..."},
@@ -759,7 +706,6 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
         "is_purchased": false,
         "is_booked": false,
         "is_ticketed": false,
-        "is_expired": false,
         "updated": "2016-02-21T04:59:22.173893Z"
       },
       "data": {"..."},
@@ -791,7 +737,6 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
       "is_purchased": false,
       "is_booked": false,
       "is_ticketed": false,
-      "is_expired": false,
       "updated": "2016-02-21T04:59:22.173893Z"
     },
     "data": {"..."},
