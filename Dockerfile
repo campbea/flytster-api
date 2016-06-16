@@ -10,8 +10,8 @@ COPY . /src/
 RUN cd /src/ && pip3 install -r requirements.txt
 WORKDIR /src/flytster
 
-# CMD ["gunicorn", "-b", "0.0.0.0:8000", "flytster.wsgi"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "flytster.wsgi"]
 
-CMD ["sh", "./deploy/start.sh"]
+# CMD ["sh", "../deploy/start.sh"]
 
 EXPOSE 8000
