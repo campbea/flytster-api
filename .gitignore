@@ -65,6 +65,4 @@ target/
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
-
-.*
-!/.gitignore
+.ebextensions/*
