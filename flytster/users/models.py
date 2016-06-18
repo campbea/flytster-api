@@ -91,7 +91,8 @@ class FlytsterUser(AbstractBaseUser):
         email_token = EmailToken(user=self, email=email)
         email_token.save()
 
-        url = 'http://192.168.99.100:8000/api/v1/user/verify-email/{}'.format(email_token.token)
+        url = '{0}/api/v1/user/verify-email/{1}'.format(
+                            settings.FLYTSTER_API_URL, email_token.token)
 
         context = {
             'full_name': self.get_full_name(),
@@ -111,7 +112,8 @@ class FlytsterUser(AbstractBaseUser):
         email_token = EmailToken(user=self, email=email)
         email_token.save()
 
-        url = 'http://192.168.99.100:8000/api/v1/user/verify-email/{}'.format(email_token.token)
+        url = '{0}/api/v1/user/verify-email/{1}'.format(
+                            settings.FLYTSTER_API_URL, email_token.token)
 
         context = {
             'full_name': self.get_full_name(),
@@ -144,7 +146,8 @@ class FlytsterUser(AbstractBaseUser):
         password_token = PasswordToken(user=self)
         password_token.save()
 
-        url = 'http://192.168.99.100:8000/api/v1/user/reset-password/{}'.format(password_token.token)
+        url = '{0}/api/v1/user/reset-password/{1}'.format(
+                            settings.FLYTSTER_API_URL, password_token.token)
 
         context = {
             'full_name': self.get_full_name(),

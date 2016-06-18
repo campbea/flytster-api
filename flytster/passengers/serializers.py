@@ -10,7 +10,7 @@ from .models import Passenger, GENDER_CHOICES
 class CreatePassengerSerializer(serializers.Serializer):
 
     trip_id = serializers.PrimaryKeyRelatedField(
-        queryset=Trip.objects.all(), source='trip', write_only=True)
+            queryset=Trip.objects.all(), source='trip', write_only=True)
     first_name = serializers.CharField(max_length=20)
     middle_name = serializers.CharField(max_length=20, default='', allow_blank=True)
     last_name = serializers.CharField(max_length=20)

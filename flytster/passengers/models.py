@@ -6,9 +6,7 @@ from trips.models import Trip
 
 GENDER_CHOICES = (
     ("M", "male"),
-    ("m", "male"),
-    ("F", "female"),
-    ("f", "female"))
+    ("F", "female"))
 
 
 class Passenger(models.Model):

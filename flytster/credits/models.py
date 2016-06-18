@@ -3,7 +3,7 @@ from django.db import models
 
 
 def set_expiration():
-    return now() + timedelta(years=1)
+    return now() + timedelta(days=settings.USER_CREDIT_EXP_IN_DAYS)
 
 
 class Credit(models.Model):
