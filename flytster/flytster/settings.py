@@ -144,17 +144,11 @@ VERIFICATION_TOKEN_EXP_IN_DAYS = 7
 USER_CREDIT_EXP_IN_DAYS = 365
 
 # Flytster info
-if TESTING:
-    EMAIL_HOST = "localhost"
-    EMAIL_PORT = "1025"
-    EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', None)
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', None)
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', None)
 
 # Google API
@@ -162,17 +156,9 @@ SERVER_KEY = os.getenv('SERVER_KEY', None)
 GOOGLE_TRIP_SEARCH_URL = 'https://www.googleapis.com/qpxExpress/v1/trips/search'
 
 # Twilio API
-if TESTING:
-    TWILIO_ACCOUNT_ID = os.getenv('TEST_TWILIO_ACCOUNT_ID')
-    TWILIO_API_TOKEN = os.getenv('TEST_TWILIO_API_TOKEN')
-    TWILIO_NUMBER = os.getenv('TEST_TWILIO_NUMBER')
-else:
-    TWILIO_ACCOUNT_ID = os.getenv('TWILIO_ACCOUNT_ID')
-    TWILIO_API_TOKEN = os.getenv('TWILIO_API_TOKEN')
-    TWILIO_NUMBER = os.getenv('TWILIO_NUMBER')
-
-# Stripe API
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', None)
+TWILIO_ACCOUNT_ID = os.getenv('TWILIO_ACCOUNT_ID')
+TWILIO_API_TOKEN = os.getenv('TWILIO_API_TOKEN')
+TWILIO_NUMBER = os.getenv('TWILIO_NUMBER')
 
 # Sabre API
 SABRE_TESTING_URL = "https://sws3-crt.cert.sabre.com"

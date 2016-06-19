@@ -13,12 +13,19 @@ To obtain airline information Flytster uses Google's [QPX Express API](https://d
 There are a few configurations managed as environment variables. In the development environment, these are injected by Docker Compose and managed in the `docker-compose.yml` file.
 
 * `DATABASE_URL` - This is the connection URL for the PostgreSQL database. It is not used in the **development environment**.
-* `DEBUG` - This toggles debug mode for the app to True/False.
 * `SECRET_KEY` - This is a secret string. It is used to encrypt and verify the authentication token on routes that require authentication. This is required. The app won't start without it.
 * `SERVER_KEY` - Google's API key to keep track of app credentials
 * `TWILIO_ACCOUNT_ID` - Twilio account id
 * `TWILIO_API_TOKEN` - Twilio authentication token
 * `TWILIO_NUMBER` - Flyter's twilio phone number in +1xxxxxxxxxx format
+
+
+## Running the Web Server with Docker
+1. Install docker, docker-compose and docker-machine
+2. Have a docker virtual machine running (check using command `docker-machine ls`)
+3. Run `docker-compose build` to create the image
+4. Run `docker-compose up` to start the db and web server containers
+5. Then you can run any Django commands using `docker-compose run web python manage.py ...` 
 
 
 ## API Table of Contents
