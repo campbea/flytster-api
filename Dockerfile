@@ -7,7 +7,7 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" 
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 RUN apt-get update -qy
-RUN apt-get install -y python3 python3-dev python3-pip gcc
+RUN apt-get install -y python3 python3-pip python3-dev gcc
 RUN apt-get install -y postgresql python-psycopg2 libpq-dev
 
 RUN mkdir /src
