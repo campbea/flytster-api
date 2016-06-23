@@ -52,7 +52,7 @@ There are a few configurations managed as environment variables. In the developm
 - [Create a trip](#create-a-trip)
 - [List all trips](#list-all-trips)
 - [Get a trip](#get-a-trip)
-- [Check trip availability](#check-trip-availability)
+- [Delete a trip](#delete-a-trip)
 
 
 ## API Routes
@@ -533,6 +533,8 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
 **Notes:**
 - `passenger_data`, 'pricing_data' and 'trip_data' objects are required.
 - `trip_data` is similar to a Google QPX tripOption. The following trip example below is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`.
+- All fields are required for `pricing_data`
+- Optional fields for a `leg` object include: `on_time_performance`, `mileage`, `meal`, `connection_duration` and `change_plane`
 
 **Body:**
 ```json

@@ -78,7 +78,7 @@ class Trip(models.Model):
         ordering = ['-timestamp']
 
     def __str__(self):
-        return '{0} {2}'.format(self.user.full_name, self.timestamp)
+        return '{0} {1}'.format(self.user.full_name, self.timestamp)
 
 
 class Flight(models.Model):
@@ -98,7 +98,7 @@ class Flight(models.Model):
         ordering = ['-timestamp']
 
     def __str__(self):
-        return '{0} {2}'.format(self.carrier, self.number)
+        return '{0} {1}'.format(self.carrier, self.number)
 
 
 class Leg(models.Model):
@@ -116,3 +116,11 @@ class Leg(models.Model):
     connection_duration = models.IntegerField(null=True, blank=True)
     change_plane = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Leg"
+        verbose_name_plural = "Legs"
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return '{0} >>> {2}'.format(self.origin, self.destination)
