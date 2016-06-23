@@ -25,7 +25,7 @@ There are a few configurations managed as environment variables. In the developm
 2. Have a docker virtual machine running (check using command `docker-machine ls`)
 3. Run `docker-compose build` to create the image
 4. Run `docker-compose up` to start the db and web server containers
-5. Then you can run any Django commands using `docker-compose run web python manage.py ...` 
+5. Then you can run any Django commands using `docker-compose run web python3 manage.py ...`
 
 
 ## API Table of Contents
@@ -515,7 +515,7 @@ Passengers are all of the individuals who will be flying on the purchased trip. 
 
 ### Trips
 
-A trip is made up of all of the user's flights purchased at once. A trip can be one-way or round-trip and a trip must be domestic. Each trip instance has a status dict field. This field represents the current status of the trip as it goes through the booking, purchasing, ticketing process. Trips are booked with Sabre and will be ticketed through a local host agency.
+A trip is made up of all of the user's flights purchased at once. A trip can be one-way or round-trip and a trip must be domestic. Each trip instance has a status dict field. This field represents the current status of the trip as it goes through the booking, purchasing, ticketing process.
 
 **STATUSES:**
 - `is_selected`: Defaults to true when a trip is initially created.
@@ -531,138 +531,173 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
 **POST:** `/api/v1/trip/`
 
 **Notes:**
-- `departure_date` is the date of trip departure in the format `YYYY-MM-DD`.
-- `trip_option` is the Google QPX tripOption. The following trip example below is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`. IMPORTANT: `trip_option` must be a Google QPX tripOption and have `kind`, `id`, `slice` and `purchase` field. The value of `kind` must be `qpxexpress#tripOption`.
+- `passenger_data`, 'pricing_data' and 'trip_data' objects are required.
+- `trip_data` is similar to a Google QPX tripOption. The following trip example below is a round trip from Chicago ORD to Denver DEN departing on `2016-02-16` and returning on `2016-02-17`.
 
 **Body:**
 ```json
 {
-    "departure_date": "2016-02-16",
-    "trip_data": {
-      "slice": [
-        {
-          "duration": 159,
-          "segment": [
-            {
-              "id": "GRVECUxTw70vJ0tX",
-              "duration": 159,
-              "carrier": "NK",
-              "number": "847",
-              "cabin": "COACH",
-              "booking_code": "Y",
-              "booking_count": 1,
-              "married": "0",
-              "leg": [
-                {
-                  "id": "LcFy6BgTQAq1iHjZ",
-                  "duration": 159,
-                  "aircraft": "320",
-                  "arrival_time": "2016-02-16T14:04-07:00",
-                  "departure_time": "2016-02-16T12:25-06:00",
-                  "origin": "ORD",
-                  "destination": "DEN"
-                }  
-              ]
-            }
-          ]
-        },
-        {
-          "duration": 151,
-          "segment": [
-            {
-              "id": "G+kXUtDqIMFX4Z5l",
-              "duration": 151,
-              "carrier": "NK",
-              "number": "630",
-              "cabin": "COACH",
-              "booking_code": "Y",
-              "booking_count": 1,
-              "married": "1",
-              "leg": [
-                {
-                  "id": "LGe417zWHUYN3Oma",
-                  "duration": 151,
-                  "aircraft": "320",
-                  "arrival_time": "2016-02-17T17:06-06:00",
-                  "departure_time": "2016-02-17T13:35-07:00",
-                  "origin": "DEN",
-                  "destination": "ORD"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    "pricing_data": {
-        "fare_total": "USD885.58",
-        "tax_total": "USD111.62",
-        "sale_total": "USD997.20",
-        "latestTicketingTime": "2016-02-16T10:25-05:00",
-        "ptc": "ADT",
-        "segmentPricing": [
+  "passenger_data": {
+      "adult_count": 1,
+      "child_count": 1
+  },
+  "pricing_data": {
+      "base": 885.58,
+      "tax": 111.62,
+      "total": 997.20,
+      "last_ticket_time": "2016-02-16T10:25-05:00",
+      "ptc": "ADT",
+      "refundable": true,
+      "fare_calculation": "END ZP OGG PDX LAX XT 8.90US 73.25US 12.00ZP"
+  },  
+  "trip_data": {
+    "slice": [
+      {
+        "duration": 159,
+        "segment": [
           {
-            "segmentId": "GRVECUxTw70vJ0tX",
-            "kind": "qpxexpress#segmentPricing",
-            "fareId": "A+2CScErZefeLB8STqkhnLUDbuPHvoW8d2mSGczs"
-          },
-          {
-            "segmentId": "G+kXUtDqIMFX4Z5l",
-            "kind": "qpxexpress#segmentPricing",
-            "fareId": "Aplj9coCfvfdtoY9NJA4IgAAPsOi/5tOnLwy7xDA"
+            "duration": 159,
+            "carrier": "NK",
+            "number": "847",
+            "cabin": "COACH",
+            "booking_code": "Y",
+            "married_group": "0",
+            "leg": [
+              {
+                "duration": 159,
+                "aircraft": "320",
+                "arrival_time": "2016-02-16T14:04-07:00",
+                "departure_time": "2016-02-16T12:25-06:00",
+                "origin": "ORD",
+                "destination": "DEN"
+              }  
+            ]
           }
-        ],
-        "tax": [
+        ]
+      },
+      {
+        "duration": 151,
+        "segment": [
           {
-            "code": "US",
-            "chargeType": "GOVERNMENT",
-            "country": "US",
-            "id": "US_001",
-            "salePrice": "USD18.01"
-          },
-          {
-            "code": "AY",
-            "chargeType": "GOVERNMENT",
-            "country": "US",
-            "id": "AY_001",
-            "salePrice": "USD11.20"
-          },
-          {
-            "code": "XF",
-            "chargeType": "GOVERNMENT",
-            "country": "US",
-            "id": "XF",
-            "salePrice": "USD9.00"
-          },
-          {
-            "code": "ZP",
-            "chargeType": "GOVERNMENT",
-            "country": "US",
-            "id": "ZP",
-            "salePrice": "USD8.00"
+            "duration": 151,
+            "carrier": "NK",
+            "number": "630",
+            "cabin": "COACH",
+            "booking_code": "Y",
+            "married_group": "1",
+            "leg": [
+              {
+                "duration": 151,
+                "aircraft": "320",
+                "arrival_time": "2016-02-17T17:06-06:00",
+                "departure_time": "2016-02-17T13:35-07:00",
+                "origin": "DEN",
+                "destination": "ORD"
+              }
+            ]
           }
-        ]    
-    }
+        ]
+      }
+    ]
+  }
 }
 ```
 
 **Response:**
 ```json
 {
-    "id": 1,
-    "user": 1,
-    "cheapest_price": 286.20,
-    "status": {
-      "is_selected": true,
-      "is_passenger_ready": false,
-      "is_available": false,
-      "is_purchased": false,
-      "is_booked": false,
-      "is_ticketed": false,
-      "updated": "2016-02-21T04:59:22.173893Z"
+  "id": 1,
+  "user": 1,
+  "price": {
+    "base": "885.58",
+    "tax": "111.62",
+    "total": "997.20",
+    "ptc": "ADT",
+    "refundable": true,
+    "last_ticket_time": "2016-02-16T10:25:00.000000Z",
+    "fare_calculation": "END ZP OGG PDX LAX XT 8.90US 73.25US 12.00ZP",
+    "expected_passengers": {
+      "adult_count": 1,
+      "child_count": 1,
+      "infant_in_lap_count": 0,
+      "infant_in_seat_count": 0,
+      "senior_count": 0
+    }
+  },
+  "flights": [
+    {
+      "id": 14,
+      "legs": [
+        {
+          "id": 14,
+          "aircraft": "320",
+          "arrival_time": "2016-02-17T23:06:00.000000Z",
+          "departure_time": "2016-02-17T20:35:00.000000Z",
+          "origin": "DEN",
+          "destination": "ORD",
+          "duration": 151,
+          "on_time_performance": null,
+          "mileage": null,
+          "meal": "",
+          "secure": true,
+          "connection_duration": null,
+          "change_plane": false,
+          "timestamp": "2016-06-22T23:57:52.660862Z",
+          "flight": 14
+        }
+      ],
+      "carrier": "NK",
+      "number": "630",
+      "duration": 151,
+      "cabin": "COACH",
+      "booking_code": "Y",
+      "married_group": "1",
+      "connection_duration": null,
+      "timestamp": "2016-06-22T23:57:52.659962Z",
+      "trip": 17
     },
-    "data": {"..."},
-    "timestamp": "2016-02-21T04:59:22.179752Z"
+    {
+      "id": 13,
+      "legs": [
+        {
+          "id": 13,
+          "aircraft": "320",
+          "arrival_time": "2016-02-16T21:04:00.000000Z",
+          "departure_time": "2016-02-16T18:25:00.000000Z",
+          "origin": "ORD",
+          "destination": "DEN",
+          "duration": 159,
+          "on_time_performance": null,
+          "mileage": null,
+          "meal": "",
+          "secure": true,
+          "connection_duration": null,
+          "change_plane": false,
+          "timestamp": "2016-06-22T23:57:52.658874Z",
+          "flight": 13
+        }
+      ],
+      "carrier": "NK",
+      "number": "847",
+      "duration": 159,
+      "cabin": "COACH",
+      "booking_code": "Y",
+      "married_group": "0",
+      "connection_duration": null,
+      "timestamp": "2016-06-22T23:57:52.657600Z",
+      "trip": 17
+    }
+  ],
+  "status": {
+    "is_selected": true,
+    "is_passenger_ready": false,
+    "is_available": false,
+    "is_purchased": false,
+    "is_booked": false,
+    "is_expired": false,
+    "updated": "2016-06-22T23:57:52.648801Z"
+  },
+  "timestamp": "2016-06-22T23:57:52.651436Z"
 }
 ```
 
@@ -689,35 +724,19 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
     {
       "id": 1,
       "user": 1,
-      "cheapest_price": 50.5,
-      "status": {
-        "is_selected": true,
-        "is_passenger_ready": false,
-        "is_available": false,
-        "is_purchased": false,
-        "is_booked": false,
-        "is_ticketed": false,
-        "updated": "2016-02-21T04:59:22.173893Z"
-      },
-      "data": {"..."},
-      "timestamp": "2016-02-21T04:59:22.179752Z"
+      "price": {...},
+      "flights": [...],
+      "status": {...},
+      "timestamp": "2016-06-22T23:57:52.651436Z"
     },
     {
       "id": 1,
       "user": 1,
-      "cheapest_price": 50.5,
-      "status": {
-        "is_selected": true,
-        "is_passenger_ready": false,
-        "is_available": false,
-        "is_purchased": false,
-        "is_booked": false,
-        "is_ticketed": false,
-        "updated": "2016-02-21T04:59:22.173893Z"
-      },
-      "data": {"..."},
-      "timestamp": "2016-02-21T04:59:22.179752Z"
-    }
+      "price": {...},
+      "flights": [...],
+      "status": {...},
+      "timestamp": "2016-06-22T23:57:52.651436Z"
+    },
   ]
 }
 ```
@@ -731,24 +750,19 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
 
 **GET:** `/api/v1/trip/:id`
 
+**Notes:**
+- Returns same response as a successful POST request.
+
 **RESPONSE:**
 ```json
 {
-    "id": 1,
-    "user": 1,
-    "cheapest_price": 50.5,
-    "status": {
-      "is_selected": true,
-      "is_passenger_ready": false,
-      "is_available": false,
-      "is_purchased": false,
-      "is_booked": false,
-      "is_ticketed": false,
-      "updated": "2016-02-21T04:59:22.173893Z"
-    },
-    "data": {"..."},
-    "timestamp": "2016-02-21T04:59:22.179752Z"
-}
+  "id": 1,
+  "user": 1,
+  "price": {...},
+  "flights": [...],
+  "status": {...},
+  "timestamp": "2016-06-22T23:57:52.651436Z"
+},
 ```
 
 **Status Codes:**
@@ -757,9 +771,11 @@ A trip is made up of all of the user's flights purchased at once. A trip can be 
 - `404` if trip search does not exist
 
 
-#### Check trip availability
+#### Delete a trip
 
-**GET:** `/api/v1/trip/availability/:id`
+**DELETE:** `/api/v1/trip/:id`
 
-**Notes:**
-- This route will check the flight availability through Sabre before the user enters their purchase info.
+**Status Codes:**
+- `204` if successful
+- `403` if user is not authenticated
+- `404` if trip search does not exist

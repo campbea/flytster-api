@@ -1,11 +1,17 @@
 import re
-import time
+from datetime import datetime
 
 from django.db.models import Min
 
 from rest_framework import serializers
 
-from .models import Trip, TripStatus
+from .models import TripStatus, TripExpectedPassengers, TripPrice, Trip, Flight, Leg
+
+
+class TripPostSerializer(serializers.Serializer):
+    passenger_data = serializers.JSONField()
+    pricing_data = serializers.JSONField()
+    trip_data = serializers.JSONField()
 
 
 class TripStatusSerializer(serializers.ModelSerializer):
@@ -16,30 +22,41 @@ class TripStatusSerializer(serializers.ModelSerializer):
             'is_purchased', 'is_booked', 'is_expired', 'updated')
 
 
-class TripPostSerializer(serializers.Serializer):
-    trip_option = serializers.JSONField()
+class TripExpectedPassengersSerializer(serializers.ModelSerializer):
 
-    def validate_trip_option(self, value):
-        if not value['kind'] == 'qpxexpress#tripOption':
-            raise serializers.ValidationError('Data must be a QPX Trip Option')
-        if not 'id' in value:
-            raise serializers.ValidationError('Data must have an id.')
-        if not 'slice' in value:
-            raise serializers.ValidationError('Data must have a slice field.')
-        if not 'pricing' in value:
-            raise serializers.ValidationError('Data must have a pricing field')
-        return value
+    class Meta:
+        model = TripExpectedPassengers
+        fields = ('adult_count', 'child_count', 'infant_in_lap_count',
+            'infant_in_seat_count', 'senior_count')
+
+
+class TripPriceSerializer(serializers.ModelSerializer):
+    expected_passengers = TripExpectedPassengersSerializer()
+
+    class Meta:
+        model = TripPrice
+        fields = ('base', 'tax', 'total', 'ptc', 'refundable',
+            'last_ticket_time', 'fare_calculation', 'expected_passengers')
+
+
+class LegSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Leg
+
+
+class FlightSerializer(serializers.ModelSerializer):
+    legs = LegSerializer(many=True)
+
+    class Meta:
+        model = Flight
 
 
 class TripSerializer(serializers.ModelSerializer):
     status = TripStatusSerializer()
-    cheapest_price = serializers.SerializerMethodField()
+    price = TripPriceSerializer()
+    flights = FlightSerializer(many=True)
 
     class Meta:
         model = Trip
-        fields = ('id', 'user', 'cheapest_price', 'status', 'data', 'timestamp')
-
-    def get_cheapest_price(self, obj):
-        if obj.prices.first():
-            d = obj.prices.aggregate(cheapest_price=Min('total'))
-            return d['cheapest_price']
+        fields = ('id', 'user', 'price', 'flights', 'status', 'timestamp')

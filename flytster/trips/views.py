@@ -7,9 +7,6 @@ from rest_framework import generics, status, views
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
-from sabre.soap_requests import (start_sabre_session, close_sabre_session,
-    check_air_availability, book_air_segment)
-
 from .models import Trip, TripStatus
 from .permissions import IsOwnerOrAdmin
 from .serializers import TripPostSerializer, TripSerializer
@@ -37,13 +34,8 @@ class TripListCreateView(generics.ListCreateAPIView):
         new_trip = self.get_serializer_class()(data=request.data)
         new_trip.is_valid(raise_exception=True)
 
-        trip = Trip.objects.create(
-            user = request.user,
-            status = TripStatus.objects.create(),
-            data = new_trip.validated_data['trip_option'])
-
         try:
-            create_flights_from_trip_data(trip)
+            trip = Trip.objects.create_trip(request.user, new_trip.validated_data)
         except InvalidTripOption as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -51,7 +43,7 @@ class TripListCreateView(generics.ListCreateAPIView):
         return Response(result.data, status=status.HTTP_201_CREATED)
 
 
-class TripRetrieveView(generics.RetrieveAPIView):
+class TripRetrieveDeleteView(generics.RetrieveDestroyAPIView):
     """
     GET: Retrieve a specific TripSearch instance
     """
@@ -60,21 +52,3 @@ class TripRetrieveView(generics.RetrieveAPIView):
     serializer_class = TripSerializer
     permission_classes = (IsOwnerOrAdmin,)
     queryset = Trip.objects.all()
-
-
-class CheckAvailabilityView(generics.RetrieveAPIView):
-    """
-    POST: Book trip with Sabre
-    """
-    model = Trip
-    serializer_class = TripSerializer
-    permission_classes = (IsOwnerOrAdmin,)
-
-    def get(self, request, *args, **kwargs):
-        trip = self.model.objects.get(pk=kwargs['pk'])
-
-        start_sabre_session()
-        check_air_availability('token', trip)
-
-        result = TripSerializer(trip)
-        return Response(result.data, status=status.HTTP_200_OK)

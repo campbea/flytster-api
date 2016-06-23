@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 from passengers.views import ListCreatePassenger, GetUpdatePassenger
-from trips.views import TripListCreateView, TripRetrieveView, CheckAvailabilityView
+from trips.views import TripListCreateView, TripRetrieveDeleteView
 from users.views import (RegisterUser, LoginUser, LogoutUser, GetUpdateUser,
     VerifyUserEmail, ChangePassword, RequestPasswordReset, ResetPassword,
     VerifyPhone)
@@ -24,7 +24,6 @@ urlpatterns = [
         url(r'^passenger/(?P<pk>[0-9]+)/?$', GetUpdatePassenger.as_view(), name='get_update_passenger'),
 
         url(r'^trip/?$', TripListCreateView.as_view(), name='trip_list_create'),
-        url(r'^trip/(?P<pk>[0-9]+)/?$', TripRetrieveView.as_view(), name='trip_retrieve'),
-        url(r'^trip/availability/(?P<pk>[0-9]+)/?$', CheckAvailabilityView.as_view(), name='trip_check_availability'),
+        url(r'^trip/(?P<pk>[0-9]+)/?$', TripRetrieveDeleteView.as_view(), name='trip_retrieve_delete'),
     ])),
 ]
