@@ -14,7 +14,7 @@ There are a few configurations managed as environment variables. In the developm
 
 * `DATABASE_URL` - This is the connection URL for the PostgreSQL database. It is not used in the **development environment**.
 * `SECRET_KEY` - This is a secret string. It is used to encrypt and verify the authentication token on routes that require authentication. This is required. The app won't start without it.
-* `SERVER_KEY` - Google's API key to keep track of app credentials
+* `QPX_SERVER_KEY` - Google's API key to keep track of app credentials
 * `TWILIO_ACCOUNT_ID` - Twilio account id
 * `TWILIO_API_TOKEN` - Twilio authentication token
 * `TWILIO_NUMBER` - Flyter's twilio phone number in +1xxxxxxxxxx format

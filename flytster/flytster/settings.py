@@ -152,7 +152,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', None)
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', None)
 
 # Google API
-SERVER_KEY = os.getenv('SERVER_KEY', None)
+QPX_SERVER_KEY = os.getenv('QPX_SERVER_KEY', None)
 GOOGLE_TRIP_SEARCH_URL = 'https://www.googleapis.com/qpxExpress/v1/trips/search'
 
 # Twilio API
