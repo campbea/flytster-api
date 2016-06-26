@@ -91,20 +91,12 @@ WSGI_APPLICATION = 'flytster.wsgi.application'
 
 
 # Database
-LOCAL_DB_IP = os.environ.get('DB_1_PORT_5432_TCP_ADDR')
+DB_URL = os.getenv('DATABASE_URL', 'postgres://postgres:postgres@{0}/postgres'.format(
+    os.getenv('DB_1_PORT_5432_TCP_ADDR')))
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://postgres:postgres@{0}/postgres'.format(LOCAL_DB_IP)
-    )
+    'default': dj_database_url.config(default=DB_URL)
 }
-
-# DB_URL = os.getenv('DATABASE_URL', 'postgres://postgres:postgres@{0}/postgres'.format(
-#     os.getenv('DB_1_PORT_5432_TCP_ADDR')))
-#
-# DATABASES = {
-#     'default': dj_database_url.config(default=DB_URL)
-# }
 
 
 # Password validation
