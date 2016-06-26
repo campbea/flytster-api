@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY', None)
 assert SECRET_KEY
 
-DEBUG = True if os.getenv('DEBUG', 'False').lower() == 'true' else False
+DEBUG = True if os.getenv('DEBUG') == 'True' else False
 
 TESTING = 'test' in sys.argv
 
@@ -91,12 +91,20 @@ WSGI_APPLICATION = 'flytster.wsgi.application'
 
 
 # Database
-DB_URL = os.getenv('DATABASE_URL', 'postgres://postgres:postgres@{0}/postgres'.format(
-    os.getenv('DB_1_PORT_5432_TCP_ADDR')))
+LOCAL_DB_IP = os.environ.get('DB_1_PORT_5432_TCP_ADDR')
 
 DATABASES = {
-    'default': dj_database_url.config(default=DB_URL)
+    'default': dj_database_url.config(
+        default='postgres://postgres:postgres@{0}/postgres'.format(LOCAL_DB_IP)
+    )
 }
+
+# DB_URL = os.getenv('DATABASE_URL', 'postgres://postgres:postgres@{0}/postgres'.format(
+#     os.getenv('DB_1_PORT_5432_TCP_ADDR')))
+#
+# DATABASES = {
+#     'default': dj_database_url.config(default=DB_URL)
+# }
 
 
 # Password validation
