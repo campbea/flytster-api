@@ -13,17 +13,7 @@
             "name": "flytster",
             "image": "flytster/flytster-api",
             "essential": true,
-            "memory": 128,
-            "environment": [
-                {
-                  "name": "SECRET_KEY",
-                  "value": "super-secret"
-                },
-                {
-                  "name": "DATABASE_URL",
-                  "value": "super-secret"
-                }
-            ]
+            "memory": 128
         }
     ]
 }

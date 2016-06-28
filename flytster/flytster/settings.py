@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY', None)
 assert SECRET_KEY
 
-DEBUG = True if os.getenv('DEBUG') == 'True' else False
+DEBUG = True if os.getenv('DEBUG') == 'True' else False 
 
 TESTING = 'test' in sys.argv
 
