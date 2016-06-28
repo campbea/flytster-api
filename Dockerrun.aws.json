@@ -1,13 +1,29 @@
 {
-  "AWSEBDockerrunVersion": "1",
-  "Image": {
-    "Name": "flytster/flytster-api",
-    "Update": "true"
-  },
-  "Ports": [
-    {
-      "ContainerPort": "8000"
-    }
-  ],
-  "Logging": "/var/log/nginx"
+    "AWSEBDockerrunVersion": 2,
+    "volumes": [
+        {
+            "name": "flytster",
+            "host": {
+                "sourcePath": "/var/app/current/app/flytster"
+            }
+        }
+    ],
+    "containerDefinitions": [
+        {
+            "name": "flytster",
+            "image": "flytster/flytster-api",
+            "essential": true,
+            "memory": 128,
+            "environment": [
+                {
+                  "name": "SECRET_KEY",
+                  "value": "super-secret"
+                },
+                {
+                  "name": "DATABASE_URL",
+                  "value": "super-secret"
+                }
+            ]
+        }
+    ]
 }
