@@ -27,9 +27,9 @@ There are a few configurations managed as environment variables. In the developm
 4. Have a docker virtual machine running (check using command `docker-machine ls`)
 5. Run `docker-compose build` to create the image
 6. Run `docker-compose up -d` to start all containers in the background
-7. Run `docker-compose run web python manage.py collectstatic` to get admin/drf static files working
-8. Run `docker-compose run web python manage.py migrate` to make initial migrations
-9. Run `docker-compose run web py.test` to run tests
+7. Run `docker-compose run web python manage.py migrate` to make initial migrations
+8. Run `docker-compose run web py.test` to run tests
+9. Routes are now ready using your docker-machine's ip
 
 
 ## API Table of Contents
