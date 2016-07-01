@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY', None)
 assert SECRET_KEY
 
-DEBUG = True if os.getenv('DEBUG') == 'True' else False 
+DEBUG = True if os.getenv('DEBUG') == 'True' else False
 
 TESTING = 'test' in sys.argv
 
@@ -91,8 +91,7 @@ WSGI_APPLICATION = 'flytster.wsgi.application'
 
 
 # Database
-DB_URL = os.getenv('DATABASE_URL', 'postgres://postgres:postgres@{0}/postgres'.format(
-    os.getenv('DB_1_PORT_5432_TCP_ADDR')))
+DB_URL = os.getenv('DATABASE_URL', 'postgres://postgres:postgres@db/postgres')
 
 DATABASES = {
     'default': dj_database_url.config(default=DB_URL)
@@ -135,7 +134,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
+# This is used to store DRF and Admin static files
+STATIC_ROOT = 'flytster/static'
+
 STATIC_URL = '/static/'
+
 
 # Application constants
 FLYTSTER_API_URL = 'http://192.168.99.100:8000'
