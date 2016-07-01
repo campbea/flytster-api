@@ -6,7 +6,7 @@ RUN apt-get update -qy && \
     apt-get install -y libpq-dev python-psycopg2
 
 # install requirements here for caching
-COPY ./requirements/requirements.txt /requirements.txt
+COPY ./requirements.txt /requirements.txt
 RUN pip install -r requirements.txt
 
 COPY . /src
